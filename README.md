@@ -8,13 +8,12 @@ Create a place where customers can shop with peace of mind without going through
 - Nguyen Ngoc Truc
 - Nguyen Gia Huy
 - Nguyen Minh Tam
-- Duong Quang Tuong
 
 ## 🏍 Start
 
 ## 🏍 Technical
 - C# .Net 5.0, Html, CSS, Bootstap, Javascript, Jquery, Ajax.
-- ASP.NET Core MVC.
+- ASP.NET Core.
 - EF Core (Database first).
 - Authorize(Roles).
 - Send mail (MailKit).
