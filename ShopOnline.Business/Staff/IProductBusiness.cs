@@ -11,7 +11,7 @@ namespace ShopOnline.Business.Staff
         Task<IPagedList<BrandInfor>> GetListBrandAsync(string sortOrder, string currentFilter, string searchString, int? page);
         Task CreateBrandAsync(BrandCreate brandCreate);
         Task<bool> EditBrandAsync(BrandInfor brandInfor);
-        BrandInfor GetBrandByIdAsync(int id);
+        Task<BrandInfor> GetBrandByIdAsync(int id);
         Task<bool> DeleteBrandAsync(int id);
 
         // Product Type
