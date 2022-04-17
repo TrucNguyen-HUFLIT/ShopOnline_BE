@@ -30,12 +30,26 @@ namespace ShopOnline.Business.Logic.Staff
 
         public async Task CreateBrandAsync(BrandCreate brandCreate)
         {
-            var brand = await _context.Brands.Where(x => x.Name == brandCreate.BrandName && !x.IsDeleted).Select(x => x.Name).FirstOrDefaultAsync();
-            if (brand == null)
+            var existedBrand = await _context.Brands.AnyAsync(x => x.Name == brandCreate.BrandName && !x.IsDeleted);
+            if (!existedBrand)
             {
+                #region Save Image from wwwroot/img
+                string wwwRootPath = hostEnvironment.WebRootPath;
+
+                string fileName = Path.GetFileNameWithoutExtension(brandCreate.UploadPic.FileName);
+                string extension = Path.GetExtension(brandCreate.UploadPic.FileName);
+                brandCreate.Pic = "/img/Brand/" + fileName + extension;
+                string path = Path.Combine(wwwRootPath + "/img/Brand/", fileName + extension);
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await brandCreate.UploadPic.CopyToAsync(fileStream);
+                }
+                #endregion
+
                 var brandEntity = new BrandEntity
                 {
                     Name = brandCreate.BrandName,
+                    Pic = brandCreate.Pic
                 };
                 _context.Brands.Add(brandEntity);
                 await _context.SaveChangesAsync();
@@ -61,18 +75,33 @@ namespace ShopOnline.Business.Logic.Staff
                 if (isExistedBrandName) throw new UserFriendlyException(ErrorCode.BrandExisted);
                 brandEntity.Name = brandInfor.BrandName;
             }
+
+            if (brandInfor.UploadPic != null)
+            {
+                string wwwRootPath = hostEnvironment.WebRootPath;
+                string fileName = Path.GetFileNameWithoutExtension(brandInfor.UploadPic.FileName);
+                string extension = Path.GetExtension(brandInfor.UploadPic.FileName);
+                brandEntity.Pic = "/img/Brand/" + fileName + extension;
+                string path = Path.Combine(wwwRootPath + "/img/Brand/", fileName + extension);
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await brandInfor.UploadPic.CopyToAsync(fileStream);
+                }
+            }
+
             _context.Brands.Update(brandEntity);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public BrandInfor GetBrandByIdAsync(int id)
+        public async Task<BrandInfor> GetBrandByIdAsync(int id)
         {
-            var brand = _context.Brands.Where(x => x.Id == id && !x.IsDeleted).Select(x => new BrandInfor
+            var brand = await _context.Brands.Where(x => x.Id == id && !x.IsDeleted).Select(x => new BrandInfor
             {
                 Id = x.Id,
                 BrandName = x.Name,
-            }).FirstOrDefault();
+                Pic = x.Pic
+            }).FirstOrDefaultAsync();
 
             return brand;
         }
@@ -88,7 +117,8 @@ namespace ShopOnline.Business.Logic.Staff
                     var brandInfor = new BrandInfor
                     {
                         Id = brand.Id,
-                        BrandName = brand.Name
+                        BrandName = brand.Name,
+                        Pic = brand.Pic
                     };
                     listBrand.Add(brandInfor);
                 }
@@ -182,6 +212,7 @@ namespace ShopOnline.Business.Logic.Staff
         {
             var brands = await _context.Brands.Where(x => !x.IsDeleted).Select(x => new BrandInfor
             {
+                Pic = x.Pic,
                 BrandName = x.Name,
                 Id = x.Id,
             }).ToListAsync();

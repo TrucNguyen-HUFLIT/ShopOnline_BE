@@ -1,4 +1,6 @@
-﻿using X.PagedList;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+using X.PagedList;
 
 namespace ShopOnline.Core.Models.Product
 {
@@ -10,10 +12,17 @@ namespace ShopOnline.Core.Models.Product
     {
         public int Id { get; set; }
         public string BrandName { get; set; }
+        public string Pic { get; set; }
+        [NotMapped]
+        public IFormFile UploadPic { get; set; }
+
     }
     public class BrandCreate
     {
         public string BrandName { get; set; }
+        public string Pic { get; set; }
+        [NotMapped]
+        public IFormFile UploadPic { get; set; }
     }
 
     public class BrandInforViewModel

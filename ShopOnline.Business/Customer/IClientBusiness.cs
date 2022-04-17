@@ -15,5 +15,7 @@ namespace ShopOnline.Business.Customer
         Task CreateReviewDetailAsync(ReviewDetailModel reviewDetail, ClaimsPrincipal user);
         Task<ProductsViewModel> GetProductsByBrandAsync(int brandId, int? typeId);
         Task<TypeOfBrandInforModel> GetTypesOfBrandAsync(int brandId);
+        Task<IEnumerable<BrandInforModel>> GetBrandAsync();
+
     }
 }

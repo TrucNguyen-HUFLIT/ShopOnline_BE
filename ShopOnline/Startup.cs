@@ -34,8 +34,6 @@ namespace ShopOnline
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
-            services.AddControllers();
-
             services.SettingAppConfig(Configuration);
 
             services.RegisterDI();
@@ -78,6 +76,7 @@ namespace ShopOnline
             });
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 

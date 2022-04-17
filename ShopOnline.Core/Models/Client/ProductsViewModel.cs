@@ -46,7 +46,7 @@ namespace ShopOnline.Core.Models.Client
 
     public class BrandInforModel : InforModel
     {
-
+        public string Pic { get; set; }
     }
 
     public class TypeInforModel : InforModel

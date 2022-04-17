@@ -71,11 +71,11 @@ namespace ShopOnline.Controllers.Staff
 
         [Authorize(Roles = ROLE.MANAGER)]
         [HttpGet("UpdateBrand")]
-        public IActionResult UpdateBrand(int id)
+        public async Task<IActionResult> UpdateBrand(int id)
         {
             var model = new BrandInforViewModel
             {
-                BrandInfor = _productBusiness.GetBrandByIdAsync(id),
+                BrandInfor = await _productBusiness.GetBrandByIdAsync(id),
             };
             return Ok(model);
         }

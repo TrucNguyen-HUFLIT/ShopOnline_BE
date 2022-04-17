@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Customer;
 using ShopOnline.Business.Staff;
@@ -8,6 +9,9 @@ using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Client;
 using ShopOnline.Core.Models.HistoryOrder;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShopOnline.Controllers.Customer
@@ -16,11 +20,13 @@ namespace ShopOnline.Controllers.Customer
     {
         private readonly IClientBusiness _clientBusiness;
         private readonly IOrderBusiness _orderBusiness;
+        private readonly IWebHostEnvironment hostEnvironment;
 
-        public ClientController(IClientBusiness clientBusiness, IOrderBusiness orderBusiness)
+        public ClientController(IClientBusiness clientBusiness, IOrderBusiness orderBusiness, IWebHostEnvironment hostEnvironment)
         {
             _clientBusiness = clientBusiness;
             _orderBusiness = orderBusiness;
+            this.hostEnvironment = hostEnvironment;
         }
 
         [HttpGet("Home")]
@@ -89,6 +95,15 @@ namespace ShopOnline.Controllers.Customer
             };
 
             return Ok(model);
+        }
+
+        [HttpGet("get-brands")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<BrandInforModel>> GetBrands()
+        {
+            var brands = await _clientBusiness.GetBrandAsync();
+
+            return brands;
         }
     }
 }

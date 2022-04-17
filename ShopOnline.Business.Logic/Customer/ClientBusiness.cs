@@ -4,6 +4,7 @@ using ShopOnline.Core;
 using ShopOnline.Core.Entities;
 using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models.Client;
+using ShopOnline.Core.Models.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -189,6 +190,7 @@ namespace ShopOnline.Business.Logic.Customer
                                 {
                                     Id = x.Id,
                                     Name = x.Name,
+                                    Pic = x.Pic
                                 })
                                 .ToListAsync();
             BrandSingleton.Instance.Init(brandInfors);
@@ -203,6 +205,7 @@ namespace ShopOnline.Business.Logic.Customer
                                         BrandId = x.Id,
                                         Type = x.ProductTypes,
                                         BrandName = x.Name,
+                                        x.Pic
                                     }).FirstOrDefaultAsync();
 
             var types = new TypeOfBrandInforModel
@@ -210,7 +213,8 @@ namespace ShopOnline.Business.Logic.Customer
                 BrandInfor = new BrandInforModel
                 {
                     Id = brandInfor.BrandId,
-                    Name = brandInfor.BrandName
+                    Name = brandInfor.BrandName,
+                    Pic = brandInfor.Pic
                 },
                 TypeInfors = brandInfor.Type.Select(x => new TypeInforModel
                 {
@@ -254,5 +258,8 @@ namespace ShopOnline.Business.Logic.Customer
                 ProductsInfor = productsInfor
             };
         }
+
+        public async Task<IEnumerable<BrandInforModel>> GetBrandAsync() 
+            => await _context.Brands.Where(x => !x.IsDeleted).Select(x => new BrandInforModel { Id = x.Id, Name = x.Name, Pic = x.Pic }).ToArrayAsync();
     }
 }
