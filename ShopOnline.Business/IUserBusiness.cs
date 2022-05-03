@@ -9,7 +9,7 @@ namespace ShopOnline.Business
     {
         Task<UserInfor> GetUserInforByClaimAsync(ClaimsPrincipal user);
         UserInfor LoadInforUser(ClaimsPrincipal user);
-        Task<ClaimsPrincipal> LoginAsync(AccountLoginModel accountLogin);
+        Task<AccessTokenModel> LoginAsync(AccountLoginModel accountLogin);
 
         Task<bool> RegisterAsync(AccountRegisterModel accountRegister);
 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace ShopOnline.Controllers
 {
-    [Authorize(Roles = ROLE.ALL)]
     public class ProfileController : ApiController
     {
         private readonly IUserBusiness _userBusiness;

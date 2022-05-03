@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using ShopOnline.Infrastructure.CurrentUsers;
+using ShopOnline.Core.Helper;
+using ShopOnline.Core.Models;
 using System;
 
-namespace ShopOnline.Infrastructure
+namespace ShopOnline.Business.Logic
 {
     public class CurrentUserService : ICurrentUserService
     {
@@ -39,7 +40,7 @@ namespace ShopOnline.Infrastructure
 
                     if (string.IsNullOrEmpty(jwtToken) == false)
                     {
-                        //_currentUser = TokenHelper.GetUserInfo(jwtToken);
+                        _currentUser = TokenHelper.GetUserInfo(jwtToken);
                     }
                 }
 

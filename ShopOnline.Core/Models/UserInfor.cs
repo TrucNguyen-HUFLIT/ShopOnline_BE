@@ -17,6 +17,17 @@ namespace ShopOnline.Core.Models
         public IFormFile UploadAvt { get; set; }
     }
 
+    public class CurrentUser
+    {
+        public int UserId { get; set; }
+        public string Email { get; set; }
+        public string FullName { get; set; }
+        public string Avatar { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
+        public TypeAcc TypeAcc { get; set; }
+    }
+
     public class ProfileViewModel
     {
         public UserInfor UserInfor { get; set; }

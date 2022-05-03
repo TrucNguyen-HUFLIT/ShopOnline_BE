@@ -3,6 +3,12 @@ using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Core.Models.Account
 {
+    public class AccessTokenModel
+    {
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
+        public TypeAcc RoleType { get; set; }
+    }
     public class AccountLoginModel
     {
         public string Email { get; set; }
@@ -13,6 +19,7 @@ namespace ShopOnline.Core.Models.Account
 
     public class BaseInforAccountModel : AccountLoginModel
     {
+        public int UserId { get; set; }
         public string FullName { get; set; }
         public string Avatar { get; set; }
         public string Phone { get; set; }

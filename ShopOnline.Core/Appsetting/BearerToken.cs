@@ -1,4 +1,4 @@
-﻿namespace ShopOnline.Appsetting
+﻿namespace ShopOnline.Core.Appsetting
 {
     public class BearerToken
     {

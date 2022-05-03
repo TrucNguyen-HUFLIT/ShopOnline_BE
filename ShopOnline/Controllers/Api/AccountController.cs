@@ -5,7 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Models.Account;
+using ShopOnline.Infrastructure.Helper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Controllers
 {
@@ -25,19 +31,9 @@ namespace ShopOnline.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(AccountLoginModel accountLogin)
+        public async Task<AccessTokenModel> Login(AccountLoginModel accountLogin)
         {
-            var claimsPrincipal = await _userBusiness.LoginAsync(accountLogin);
-
-            if (claimsPrincipal != null)
-            {
-                await HttpContext.SignInAsync(claimsPrincipal);
-                return Ok();
-            }
-            else
-            {
-                return Unauthorized();
-            }
+            return await _userBusiness.LoginAsync(accountLogin);
         }
 
         [HttpGet("Logout")]

@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Core.Filters;
+using ShopOnline.Core.Models;
+using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Controllers.Api
 {
     [Route("api/[controller]")]
-    [Authorize]
+    [ApiController]
+    //[AuthorizeFilter(TypeAcc.Staff, TypeAcc.Admin, TypeAcc.Manager, TypeAcc.Customer, TypeAcc.Shipper)]
     [ServiceFilter(typeof(ValidateActionFilterAttribute))]
     [ServiceFilter(typeof(ValidationModelFilterAttribute))]
     [ServiceFilter(typeof(WrapperResultActionFilterAttribute))]

@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using ShopOnline.Business;
 using ShopOnline.Business.Customer;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
+using ShopOnline.Core.Filters;
 using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Client;
 using ShopOnline.Core.Models.HistoryOrder;
-using System;
+using ShopOnline.Core.Models.Mobile;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Controllers.Customer
 {
@@ -20,13 +20,12 @@ namespace ShopOnline.Controllers.Customer
     {
         private readonly IClientBusiness _clientBusiness;
         private readonly IOrderBusiness _orderBusiness;
-        private readonly IWebHostEnvironment hostEnvironment;
 
-        public ClientController(IClientBusiness clientBusiness, IOrderBusiness orderBusiness, IWebHostEnvironment hostEnvironment)
+        public ClientController(IClientBusiness clientBusiness,
+            IOrderBusiness orderBusiness)
         {
             _clientBusiness = clientBusiness;
             _orderBusiness = orderBusiness;
-            this.hostEnvironment = hostEnvironment;
         }
 
         [HttpGet("Home")]
@@ -55,7 +54,7 @@ namespace ShopOnline.Controllers.Customer
             return Ok(productDetailPageViewModel);
         }
 
-        [Authorize(Roles = ROLE.CUSTOMER)]
+        [AuthorizeFilter(TypeAcc.Customer)]
         [HttpPost("CreateReviewDetail")]
         public async Task<IActionResult> CreateReviewDetailAsync(ReviewDetailModel reviewDetail)
         {
@@ -83,7 +82,7 @@ namespace ShopOnline.Controllers.Customer
             return Ok(productsBrandPageViewModel);
         }
 
-        [Authorize(Roles = ROLE.CUSTOMER)]
+        [AuthorizeFilter(TypeAcc.Customer)]
         [HttpGet("ListHistoryOrderCustomer")]
         public async Task<IActionResult> ListHistoryOrderCustomerAsync(string sortOrder, string currentFilter, int? page)
         {
@@ -97,13 +96,41 @@ namespace ShopOnline.Controllers.Customer
             return Ok(model);
         }
 
-        [HttpGet("get-brands")]
+        [HttpGet("brands")]
         [AllowAnonymous]
         public async Task<IEnumerable<BrandInforModel>> GetBrands()
         {
             var brands = await _clientBusiness.GetBrandAsync();
 
             return brands;
+        }
+
+
+        [HttpGet("popular-products")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<ProductDetailModel>> GetPopularProducts()
+        {
+            var popularProducts = await _clientBusiness.GetPopularProductsAsync();
+
+            return popularProducts;
+        }
+
+        [HttpGet("product-by-id-detail")]
+        [AllowAnonymous]
+        public async Task<ProductModel> GetProductByIdDetail(int idProductDetail)
+        {
+            var product = await _clientBusiness.GetProductByIdDetailAsync(idProductDetail);
+
+            return product;
+        }
+
+        [HttpGet("favorite-products")]
+        [AuthorizeFilter(TypeAcc.Customer)]
+        public async Task<IEnumerable<ProductDetailModel>> GetFavoriteProducts()
+        {
+            var favoriteProducts = await _clientBusiness.GetFavoriteProductsAsync();
+
+            return favoriteProducts;
         }
     }
 }
