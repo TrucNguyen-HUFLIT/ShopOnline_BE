@@ -1,6 +1,6 @@
-﻿using ShopOnline.Infrastructure.CurrentUsers;
+﻿using ShopOnline.Core.Models;
 
-namespace ShopOnline.Infrastructure
+namespace ShopOnline.Business
 {
     public interface ICurrentUserService
     {

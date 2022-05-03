@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business;
 using ShopOnline.Business.Customer;
 using ShopOnline.Controllers.Api;
+using ShopOnline.Core.Filters;
 using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Client;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace ShopOnline.Controllers.Customer
             return Ok(productCart);
         }
 
-        [Authorize(Roles = ROLE.CUSTOMER)]
+        [AuthorizeFilter(TypeAcc.Customer)]
         [HttpGet("CheckOut")]
         public async Task<IActionResult> CheckOutAsync()
         {
@@ -45,7 +46,7 @@ namespace ShopOnline.Controllers.Customer
             return Ok(response);
         }
 
-        [Authorize(Roles = ROLE.CUSTOMER)]
+        [AuthorizeFilter(TypeAcc.Customer)]
         [HttpPost("CheckOut")]
         public async Task<IActionResult> CheckOutAsync(PaymentMethod paymentMethod, string address)
         {
@@ -53,7 +54,7 @@ namespace ShopOnline.Controllers.Customer
             return Ok(newOrderId);
         }
 
-        [Authorize(Roles = ROLE.CUSTOMER)]
+        [AuthorizeFilter(TypeAcc.Customer)]
         [HttpGet("DigitalPayment")]
         public async Task<IActionResult> DigitalPayment(int id)
         {
@@ -61,7 +62,7 @@ namespace ShopOnline.Controllers.Customer
             return Ok(orderInfor);
         }
 
-        [Authorize(Roles = ROLE.CUSTOMER)]
+        [AuthorizeFilter(TypeAcc.Customer)]
         [HttpGet("ShipCODPayment")]
         public async Task<IActionResult> ShipCODPayment(int id)
         {

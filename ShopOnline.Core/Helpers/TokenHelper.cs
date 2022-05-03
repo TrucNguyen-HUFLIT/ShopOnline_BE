@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using ShopOnline.Appsetting;
-using ShopOnline.Infrastructure.CurrentUsers;
+using ShopOnline.Core.Appsetting;
+using ShopOnline.Core.Constants;
+using ShopOnline.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using static ShopOnline.Core.Models.Enum.AppEnum;
 
-namespace PostalCode.Infrastructure.Helper
+namespace ShopOnline.Core.Helper
 {
     public static class TokenHelper
     {
@@ -49,12 +50,16 @@ namespace PostalCode.Infrastructure.Helper
             var claims = tokenRead.Claims;
 
             var role = (TypeAcc)Enum.Parse(typeof(TypeAcc), claims.Where(x => x.Type == "role").Select(x => x.Value).FirstOrDefault(), true);
-            var userId = int.Parse(claims.Where(x => x.Type == "certserialnumber").Select(x => x.Value).FirstOrDefault());
 
             return new CurrentUser
             {
-                TypeAcc = role,
-                UserId = userId,
+                TypeAcc = TypeAcc.Staff,
+                UserId = int.Parse(claims.Where(x => x.Type.Contains("id")).Select(x => x.Value).FirstOrDefault()),
+                Email = claims.Where(x => x.Type.Contains("email")).Select(x => x.Value).FirstOrDefault(),
+                FullName = claims.Where(x => x.Type.Contains("name")).Select(x => x.Value).FirstOrDefault(),
+                Phone = claims.Where(x => x.Type.Contains("phone")).Select(x => x.Value).FirstOrDefault(),
+                Address = claims.Where(x => x.Type.Contains("address")).Select(x => x.Value).FirstOrDefault(),
+                Avatar = claims.Where(x => x.Type.Contains("avatar")).Select(x => x.Value).FirstOrDefault(),
             };
         }
     }

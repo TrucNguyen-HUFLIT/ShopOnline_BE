@@ -82,7 +82,11 @@ namespace ShopOnline.Core.Models.Enum
 
         [Display(GroupName = "User")]
         [Description("Not found user")]
-        NotFoundUser = Cart + 1,
+        NotFoundUser = User + 2,
+
+        [Display(GroupName = "User")]
+        [Description("Do not have permission - Unauthorized")]
+        Unauthorized = User + 3,
 
         #endregion
 

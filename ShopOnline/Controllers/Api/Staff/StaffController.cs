@@ -5,7 +5,6 @@ using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
 using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Staff;
-using System;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
 
@@ -20,7 +19,7 @@ namespace ShopOnline.Controllers.Staff
             _staffBusiness = staffBusiness;
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("ListStaff")]
         public async Task<IActionResult> ListStaff(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -40,7 +39,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("CreateStaff")]
         public IActionResult CreateStaff()
         {
@@ -51,7 +50,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("CreateStaff")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -61,7 +60,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("UpdateStaff")]
         public IActionResult UpdateStaff(int id)
         {
@@ -72,7 +71,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("UpdateStaff")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateStaff(StaffEdit staffEdit)
@@ -81,7 +80,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(staffEdit.Id);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("DeleteStaff")]
         public async Task<IActionResult> DeleteStaff(int id)
         {
@@ -89,7 +88,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("ListShipper")]
         public async Task<IActionResult> ListShipper(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -109,7 +108,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("CreateShipper")]
         public IActionResult CreateShipper()
         {
@@ -120,7 +119,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("CreateShipper")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -130,7 +129,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("UpdateShipper")]
         public IActionResult UpdateShipper(int id)
         {
@@ -141,7 +140,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("UpdateShipper")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateShipper(StaffEdit staffEdit)
@@ -150,7 +149,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(staffEdit.Id);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("DeleteShipper")]
         public async Task<IActionResult> DeleteShipper(int id)
         {
@@ -158,7 +157,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.ADMIN)]
+        [AuthorizeFilter(TypeAcc.Admin)]
         [HttpGet("ListManager")]
         public async Task<IActionResult> ListManager(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -178,7 +177,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.ADMIN)]
+        [AuthorizeFilter(TypeAcc.Admin)]
         [HttpGet("CreateManager")]
         public IActionResult CreateManager()
         {
@@ -189,7 +188,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.ADMIN)]
+        [AuthorizeFilter(TypeAcc.Admin)]
         [HttpPost("CreateManager")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -199,7 +198,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.ADMIN)]
+        [AuthorizeFilter(TypeAcc.Admin)]
         [HttpGet("UpdateManager")]
         public IActionResult UpdateManager(int id)
         {
@@ -210,7 +209,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.ADMIN)]
+        [AuthorizeFilter(TypeAcc.Admin)]
         [HttpPost("UpdateManager")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateManager(StaffEdit staffEdit)
@@ -219,7 +218,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(staffEdit.Id);
         }
 
-        [Authorize(Roles = ROLE.ADMIN)]
+        [AuthorizeFilter(TypeAcc.Admin)]
         [HttpGet("DeleteManager")]
         public async Task<IActionResult> DeleteManager(int id)
         {

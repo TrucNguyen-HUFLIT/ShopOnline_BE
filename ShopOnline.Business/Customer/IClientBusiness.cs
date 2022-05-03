@@ -1,5 +1,6 @@
 ﻿
 using ShopOnline.Core.Models.Client;
+using ShopOnline.Core.Models.Mobile;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -16,6 +17,9 @@ namespace ShopOnline.Business.Customer
         Task<ProductsViewModel> GetProductsByBrandAsync(int brandId, int? typeId);
         Task<TypeOfBrandInforModel> GetTypesOfBrandAsync(int brandId);
         Task<IEnumerable<BrandInforModel>> GetBrandAsync();
+        Task<IEnumerable<ProductDetailModel>> GetPopularProductsAsync();
+        Task<IEnumerable<ProductDetailModel>> GetFavoriteProductsAsync();
+        Task<ProductModel> GetProductByIdDetailAsync(int idProductDetail);
 
     }
 }

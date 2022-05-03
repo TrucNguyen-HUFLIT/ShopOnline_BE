@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PostalCode.Infrastructure.Middleware;
-using ShopOnline.Appsetting;
+using ShopOnline.Core.Appsetting;
 using ShopOnline.Core;
 using ShopOnline.Core.Filters;
 using ShopOnline.Infrastructure.Extensions;
