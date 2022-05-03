@@ -6,13 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ShopOnline.Appsetting;
 using ShopOnline.Business;
 using ShopOnline.Business.Customer;
 using ShopOnline.Business.Logic;
 using ShopOnline.Business.Logic.Customer;
 using ShopOnline.Business.Logic.Staff;
 using ShopOnline.Business.Staff;
+using ShopOnline.Core.Appsetting;
 using ShopOnline.Data.Repositories.Product;
 using ShopOnline.Infrastructure.Helper;
 using System;
@@ -25,6 +25,8 @@ namespace ShopOnline.Infrastructure.Extensions
         public static IServiceCollection RegisterDI(this IServiceCollection services)
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+         
             services.AddScoped<IUserBusiness, UserBusiness>();
             services.AddScoped<IClientBusiness, ClientBusiness>();
             services.AddScoped<IStaffBusiness, StaffBusiness>();

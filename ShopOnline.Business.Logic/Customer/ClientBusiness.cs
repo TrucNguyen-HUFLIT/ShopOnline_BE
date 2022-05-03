@@ -2,24 +2,32 @@
 using ShopOnline.Business.Customer;
 using ShopOnline.Core;
 using ShopOnline.Core.Entities;
+using ShopOnline.Core.Exceptions;
 using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models.Client;
+using ShopOnline.Core.Models.Enum;
+using ShopOnline.Core.Models.Mobile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
+using ProductDetailModel = ShopOnline.Core.Models.Mobile.ProductDetailModel;
+using ProductInforModel = ShopOnline.Core.Models.Client.ProductInforModel;
 
 namespace ShopOnline.Business.Logic.Customer
 {
     public class ClientBusiness : IClientBusiness
     {
         private readonly MyDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
 
-        public ClientBusiness(MyDbContext context)
+        public ClientBusiness(MyDbContext context,
+            ICurrentUserService currentUserService)
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
 
         public async Task<List<ProductInforViewModel>> GetProductsAsync(int? amountTake)
@@ -41,12 +49,12 @@ namespace ShopOnline.Business.Logic.Customer
                                         .OrderByDescending(x => x.Id)
                                         .Take(amountTake ?? 0)
                                         .ToListAsync();
-            var productsInforDetail = new List<ProductInforModel>();
+            var productsInforDetail = new List<Core.Models.Client.ProductInforModel>();
 
             foreach (var product in productsDetail)
             {
                 var priceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.Price);
-                productsInforDetail.Add(new ProductInforModel
+                productsInforDetail.Add(new Core.Models.Client.ProductInforModel
                 {
                     Id = product.Id,
                     Name = product.Name,
@@ -94,7 +102,7 @@ namespace ShopOnline.Business.Logic.Customer
                                                             {
                                                                 Id = y.Id,
                                                                 Quantity = y.Quantity,
-                                                                Size = y.Size,
+                                                                ProductSize = y.Size,
                                                                 IsAvailable = true
                                                             })
                                                             .ToList(),
@@ -116,7 +124,7 @@ namespace ShopOnline.Business.Logic.Customer
             productDetail.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(productDetail.PriceVND);
 
             var availableSize = productDetail.BaseProductInfors
-                                        .Select(x => x.Size)
+                                        .Select(x => x.ProductSize)
                                         .ToArray();
             var productSizes = Enum.GetValues(typeof(ProductSize))
                            .Cast<ProductSize>()
@@ -128,16 +136,16 @@ namespace ShopOnline.Business.Logic.Customer
                 {
                     productDetail.BaseProductInfors.Add(new BaseProductInfor
                     {
-                        Size = productSize
+                        ProductSize = productSize
                     });
                 }
             }
-            productDetail.BaseProductInfors = productDetail.BaseProductInfors.OrderBy(x => (int)x.Size).ToList();
+            productDetail.BaseProductInfors = productDetail.BaseProductInfors.OrderBy(x => (int)x.ProductSize).ToList();
 
             return productDetail;
         }
 
-        public async Task<List<ProductInforModel>> GetCurrentProductsInforAsync(int amountTake)
+        public async Task<List<Core.Models.Client.ProductInforModel>> GetCurrentProductsInforAsync(int amountTake)
         {
             var products = await _context.ProductDetails
                                          .Where(x => !x.IsDeleted)
@@ -189,6 +197,7 @@ namespace ShopOnline.Business.Logic.Customer
                                 {
                                     Id = x.Id,
                                     Name = x.Name,
+                                    Pic = x.Pic
                                 })
                                 .ToListAsync();
             BrandSingleton.Instance.Init(brandInfors);
@@ -203,6 +212,7 @@ namespace ShopOnline.Business.Logic.Customer
                                         BrandId = x.Id,
                                         Type = x.ProductTypes,
                                         BrandName = x.Name,
+                                        x.Pic
                                     }).FirstOrDefaultAsync();
 
             var types = new TypeOfBrandInforModel
@@ -210,7 +220,8 @@ namespace ShopOnline.Business.Logic.Customer
                 BrandInfor = new BrandInforModel
                 {
                     Id = brandInfor.BrandId,
-                    Name = brandInfor.BrandName
+                    Name = brandInfor.BrandName,
+                    Pic = brandInfor.Pic
                 },
                 TypeInfors = brandInfor.Type.Select(x => new TypeInforModel
                 {
@@ -253,6 +264,117 @@ namespace ShopOnline.Business.Logic.Customer
                 AmountProduct = amountProduct,
                 ProductsInfor = productsInfor
             };
+        }
+
+        public async Task<IEnumerable<BrandInforModel>> GetBrandAsync()
+            => await _context.Brands.Where(x => !x.IsDeleted).Select(x => new BrandInforModel { Id = x.Id, Name = x.Name, Pic = x.Pic }).ToArrayAsync();
+
+        public async Task<IEnumerable<ProductDetailModel>> GetPopularProductsAsync()
+        {
+            var userId = _currentUserService.Current?.UserId;
+            var popularProducts = await _context.Products
+                .Where(x => !x.IsDeleted && x.OrderDetails.Any() && !x.ProductDetail.IsDeleted && x.ProductDetail.Status == ProductStatus.Available)
+                .Select(x => new ProductDetailModel
+                {
+                    Id = x.IdProductDetail,
+                    Name = x.Name,
+                    PriceVND = x.ProductDetail.Price,
+                    Pic = x.ProductDetail.Pic1
+                })
+                .Distinct()
+                .ToListAsync();
+
+            var favoriteProductDetailIds = new List<int>();
+
+            if (userId != null)
+            {
+                favoriteProductDetailIds = await _context.FavoriteProducts
+                    .Where(x => !x.IsDeleted && x.IdCustomer == userId)
+                    .Select(x => x.IdProductDetail)
+                    .ToListAsync();
+            }
+
+            foreach (var product in popularProducts)
+            {
+                product.IsFavorite = favoriteProductDetailIds.Contains(product.Id);
+                product.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.PriceVND);
+            }
+
+            return popularProducts;
+        }
+
+        public async Task<ProductModel> GetProductByIdDetailAsync(int idProductDetail)
+        {
+            var userId = _currentUserService.Current?.UserId;
+            var product = await _context.ProductDetails
+                .Where(x => !x.IsDeleted && x.Status == ProductStatus.Available && x.Id == idProductDetail)
+                .Select(x => new ProductModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PriceVND = x.Price,
+                    Pic = x.Pic1,
+                    Pic2 = x.Pic2,
+                    Pic3 = x.Pic3,
+                    Description = x.Description,
+                    ProductSizes = x.Products
+                        .Where(y => !y.IsDeleted && y.Quantity > 0)
+                        .Select(y => new BaseProductInfor
+                        {
+                            Id = y.Id,
+                            IsAvailable = true,
+                            ProductSize = y.Size,
+                            Size = (int)y.Size,
+                            Quantity = y.Quantity,
+                        }),
+                })
+                .FirstOrDefaultAsync();
+
+            if (userId != null)
+            {
+                product.IsFavorite = await _context.FavoriteProducts
+                    .AnyAsync(x => !x.IsDeleted && x.IdCustomer == userId && x.IdProductDetail == product.Id);
+            }
+
+            product.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.PriceVND);
+
+            return product;
+        }
+
+        public async Task<IEnumerable<ProductDetailModel>> GetFavoriteProductsAsync()
+        {
+            var userId = _currentUserService.Current?.UserId;
+
+            if (userId == null)
+                throw new UserFriendlyException(ErrorCode.Unauthorized);
+
+            var favoriteProductDetailIds = await _context.FavoriteProducts
+                    .Where(x => !x.IsDeleted && x.IdCustomer == userId)
+                    .Select(x => x.IdProductDetail)
+                    .ToListAsync();
+
+            var favoriteProducts = await _context.Products
+                .Where(x => !x.IsDeleted
+                    && !x.ProductDetail.IsDeleted
+                    && favoriteProductDetailIds.Contains(x.IdProductDetail)
+                    && x.ProductDetail.Status == ProductStatus.Available)
+                .Select(x => new ProductDetailModel
+                {
+                    Id = x.IdProductDetail,
+                    Name = x.Name,
+                    PriceVND = x.ProductDetail.Price,
+                    Pic = x.ProductDetail.Pic1,
+                    IsFavorite = true
+                })
+                .Distinct()
+                .ToListAsync();
+
+            foreach (var product in favoriteProducts)
+            {
+                product.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.PriceVND);
+            }
+
+            return favoriteProducts;
         }
     }
 }

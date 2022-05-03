@@ -25,7 +25,7 @@ namespace ShopOnline.Controllers.Staff
             _clientBusiness = clientBusiness;
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("ListBrand")]
         public async Task<IActionResult> ListBrand(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -47,7 +47,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("CreateBrand")]
         public IActionResult CreateBrand()
         {
@@ -58,7 +58,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("CreateBrand")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -69,7 +69,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("UpdateBrand")]
         public IActionResult UpdateBrand(int id)
         {
@@ -80,7 +80,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("UpdateBrand")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateBrand(BrandInfor brandInfor)
@@ -90,7 +90,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(brandInfor.Id);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("DeleteBrandAsync")]
         public async Task<IActionResult> DeleteBrandAsync(int id)
         {
@@ -99,7 +99,7 @@ namespace ShopOnline.Controllers.Staff
         }
 
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("ListProductType")]
         public async Task<IActionResult> ListProductType(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -122,7 +122,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("CreateProductType")]
         public async Task<IActionResult> CreateProductType()
         {
@@ -134,7 +134,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("CreateProductType")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -144,7 +144,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("UpdateProductType")]
         public async Task<IActionResult> UpdateProductTypeAsync(int id)
         {
@@ -156,7 +156,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("UpdateProductType")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -166,7 +166,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(productType.Id);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("DeleteProductType")]
         public async Task<IActionResult> DeleteProductTypeAsync(int id)
         {
@@ -174,7 +174,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("CreateProductDetail")]
         public async Task<IActionResult> CreateProductDetail()
         {
@@ -186,7 +186,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("CreateProductDetail")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -196,7 +196,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("UpdateProductDetail")]
         public async Task<IActionResult> UpdateProductDetail(int id)
         {
@@ -208,7 +208,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpPost("UpdateProductDetail")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateProductDetail(ProductDetailUpdate productDetailUpdate)
@@ -217,7 +217,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(productDetailUpdate.Id);
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("DeleteProductDetail")]
         public async Task<IActionResult> DeleteProductDetailAsync(int id)
         {
@@ -225,7 +225,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.MANAGER)]
+        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("ListProductDetail")]
         public async Task<IActionResult> ListProductDetail(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -249,7 +249,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("GetListProductDetail")]
         public async Task<IActionResult> GetListProductDetail()
         {
@@ -257,7 +257,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(listProductDetail);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("CreateProduct")]
         public async Task<IActionResult> CreateProduct()
         {
@@ -270,7 +270,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpPost("CreateProduct")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
@@ -280,7 +280,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("UpdateProduct")]
         public async Task<IActionResult> UpdateProduct(int id)
         {
@@ -292,7 +292,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpPost("UpdateProduct")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateProduct(ProductUpdate productUpdate)
@@ -301,7 +301,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(productUpdate.Id);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("DeleteProduct")]
         public async Task<IActionResult> DeleteProductAsync(int id)
         {
@@ -309,7 +309,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("ListProduct")]
         public async Task<IActionResult> ListProduct(string sortOrder, string currentFilter, string searchString, int? page)
         {
@@ -324,7 +324,7 @@ namespace ShopOnline.Controllers.Staff
             else searchString = currentFilter;
             //ViewBag.CurrentFilter = searchString;
 
-            var model = new ProductModel
+            var model = new ProductInforModel
             {
                 ListProductDetail = await _productBusiness.GetListProductDetail(),
                 ListProduct = await _productBusiness.GetListProductAsync(sortOrder, currentFilter, searchString, page)

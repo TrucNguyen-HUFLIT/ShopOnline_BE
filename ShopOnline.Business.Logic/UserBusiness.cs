@@ -1,11 +1,12 @@
 ﻿using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using ShopOnline.Core;
+using ShopOnline.Core.Constants;
 using ShopOnline.Core.Entities;
 using ShopOnline.Core.Exceptions;
+using ShopOnline.Core.Helper;
 using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Account;
@@ -13,7 +14,6 @@ using ShopOnline.Core.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
@@ -33,29 +33,48 @@ namespace ShopOnline.Business.Logic
             _hostEnvironment = hostEnvironment;
         }
 
-        public async Task<ClaimsPrincipal> LoginAsync(AccountLoginModel accountLogin)
+        public async Task<AccessTokenModel> LoginAsync(AccountLoginModel accountLogin)
         {
-            Expression<Func<IBaseUserEntity, BaseInforAccountModel>> selectBaseInforAccount = x => new BaseInforAccountModel
-            {
-                Email = x.Email,
-                Password = x.Password,
-                FullName = x.FullName,
-                TypeAcc = x.TypeAcc,
-                Phone = x.PhoneNumber,
-                Address = x.Address,
-                Avatar = x.Avatar
-            };
-
             var inforAccount = await _context.Customers.Where(x => x.Email == accountLogin.Email && !x.IsDeleted)
-                                        .Select(selectBaseInforAccount)
+                                        .Select(x => new BaseInforAccountModel
+                                        {
+                                            UserId = x.Id,
+                                            Email = x.Email,
+                                            Password = x.Password,
+                                            FullName = x.FullName,
+                                            TypeAcc = x.TypeAcc,
+                                            Phone = x.PhoneNumber,
+                                            Address = x.Address,
+                                            Avatar = x.Avatar
+                                        })
                                         .FirstOrDefaultAsync();
             if (inforAccount == null)
                 inforAccount = await _context.Staffs.Where(x => x.Email == accountLogin.Email && !x.IsDeleted)
-                                        .Select(selectBaseInforAccount)
+                                        .Select(x => new BaseInforAccountModel
+                                        {
+                                            UserId = x.Id,
+                                            Email = x.Email,
+                                            Password = x.Password,
+                                            FullName = x.FullName,
+                                            TypeAcc = x.TypeAcc,
+                                            Phone = x.PhoneNumber,
+                                            Address = x.Address,
+                                            Avatar = x.Avatar
+                                        })
                                         .FirstOrDefaultAsync();
             if (inforAccount == null)
                 inforAccount = await _context.Shippers.Where(x => x.Email == accountLogin.Email && !x.IsDeleted)
-                                        .Select(selectBaseInforAccount)
+                                        .Select(x => new BaseInforAccountModel
+                                        {
+                                            UserId = x.Id,
+                                            Email = x.Email,
+                                            Password = x.Password,
+                                            FullName = x.FullName,
+                                            TypeAcc = x.TypeAcc,
+                                            Phone = x.PhoneNumber,
+                                            Address = x.Address,
+                                            Avatar = x.Avatar
+                                        })
                                         .FirstOrDefaultAsync();
             if (inforAccount == null)
                 throw new UserFriendlyException(ErrorCode.WrongEmail);
@@ -89,18 +108,17 @@ namespace ShopOnline.Business.Logic
                 throw new UserFriendlyException(ErrorCode.WrongPassword);
 
             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, inforAccount.Email),
-                    new Claim(ClaimTypes.Name, inforAccount.FullName),
-                    new Claim(ClaimTypes.Role, inforAccount.TypeAcc.ToString().ToLower()),
-                    new Claim(ClaimTypes.MobilePhone, inforAccount.Phone),
-                    new Claim("avatar", inforAccount.Avatar ?? "/img/Avatar/avatar-icon-images-4.jpg"),
-                    new Claim(ClaimTypes.StreetAddress, inforAccount.Address ?? ""),
-                };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            {
+                new Claim("name", inforAccount.FullName),
+                new Claim("role", inforAccount.TypeAcc.ToString()),
+                new Claim("phone", inforAccount.Phone),
+                new Claim("avatar", inforAccount.Avatar ?? "/img/Avatar/avatar-icon-images-4.jpg"),
+                new Claim("address", inforAccount.Address ?? ""),
+                new Claim("email", inforAccount.Email),
+                new Claim("id", inforAccount.UserId.ToString())
+            };
 
-            return claimsPrincipal;
+            return GenericAccessToken(claims);
         }
 
         public async Task<bool> RegisterAsync(AccountRegisterModel accountRegister)
@@ -517,6 +535,22 @@ namespace ShopOnline.Business.Logic
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private AccessTokenModel GenericAccessToken(List<Claim> claims)
+        {
+            var refreshToken = Guid.NewGuid().ToString("N");
+
+            var role = (TypeAcc)Enum.Parse(typeof(TypeAcc), claims.Where(x => x.Type.Contains("role")).Select(x => x.Value).FirstOrDefault(), true);
+
+            var accessToken = new AccessTokenModel
+            {
+                AccessToken = TokenHelper.GenerateToken(claims),
+                RefreshToken = refreshToken,
+                RoleType = role
+            };
+
+            return accessToken;
         }
     }
 }

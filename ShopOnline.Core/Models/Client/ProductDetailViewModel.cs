@@ -30,7 +30,8 @@ namespace ShopOnline.Core.Models.Client
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
-        public ProductSize Size { get; set; }
+        public ProductSize ProductSize { get; set; }
+        public int Size { get; set; }
         public bool IsAvailable { get; set; }
     }
 }

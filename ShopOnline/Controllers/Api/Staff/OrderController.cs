@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
+using ShopOnline.Core.Filters;
 using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.HistoryOrder;
 using ShopOnline.Core.Models.Order;
-using System;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
 
@@ -22,7 +22,7 @@ namespace ShopOnline.Controllers.Staff
             _reviewBusiness = reviewBusiness;
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("ListOrder")]
         public async Task<IActionResult> ListOrder(string sortOrder, int statusOrder, int? page)
         {
@@ -40,7 +40,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("ListOrderProcessing")]
         public async Task<IActionResult> ListOrderProcessing(string sortOrder, int? page)
         {
@@ -56,7 +56,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("AcceptOrder")]
         public async Task<IActionResult> AcceptOrder(int id)
         {
@@ -64,7 +64,7 @@ namespace ShopOnline.Controllers.Staff
             return RedirectToAction("ListOrderProcessing");
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("CancelOrder")]
         public async Task<IActionResult> CancelOrder(int id)
         {
@@ -72,7 +72,7 @@ namespace ShopOnline.Controllers.Staff
             return RedirectToAction("ListOrderProcessing");
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("PayOrder")]
         public async Task<IActionResult> PayOrder(int id, bool isPaid)
         {
@@ -80,7 +80,7 @@ namespace ShopOnline.Controllers.Staff
             return RedirectToAction("ListOrderProcessing");
         }
 
-        [Authorize(Roles = ROLE.SHIPPER)]
+        [AuthorizeFilter(TypeAcc.Shipper)]
         [HttpGet("ListHistoryOrderShipper")]
         public async Task<IActionResult> ListHistoryOrderShipperAsync(string sortOrder, string currentFilter, int? page)
         {
@@ -96,7 +96,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.SHIPPER)]
+        [AuthorizeFilter(TypeAcc.Shipper)]
         [HttpGet("ListOrderShipper")]
         public async Task<IActionResult> ListOrderShipperAsync(string sortOrder, string currentFilter, int? page)
         {
@@ -112,7 +112,7 @@ namespace ShopOnline.Controllers.Staff
             return Ok(model);
         }
 
-        [Authorize(Roles = ROLE.SHIPPER)]
+        [AuthorizeFilter(TypeAcc.Shipper)]
         [HttpGet("AcceptDelivery")]
         public async Task<IActionResult> AcceptDelivery(int id)
         {
@@ -120,7 +120,7 @@ namespace ShopOnline.Controllers.Staff
             return RedirectToAction("ListOrderShipper");
         }
 
-        [Authorize(Roles = ROLE.SHIPPER)]
+        [AuthorizeFilter(TypeAcc.Shipper)]
         [HttpGet("CompleteOrder")]
         public async Task<IActionResult> CompleteOrder(int id)
         {

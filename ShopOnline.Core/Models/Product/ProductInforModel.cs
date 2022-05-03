@@ -4,7 +4,7 @@ using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Core.Models.Product
 {
-    public class ProductModel
+    public class ProductInforModel
     {
         public ProductInfor productInfor { get; set; }
         public List<ProductDetailInfor> ListProductDetail { get; set; }

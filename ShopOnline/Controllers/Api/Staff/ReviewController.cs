@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
+using ShopOnline.Core.Filters;
 using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Review;
-using System;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
 
@@ -19,7 +19,7 @@ namespace ShopOnline.Controllers.Staff
             _reviewBusiness = reviewBusiness;
         }
 
-        [Authorize(Roles = ROLE.STAFF)]
+        [AuthorizeFilter(TypeAcc.Staff)]
         [HttpGet("ListReview")]
         public async Task<IActionResult> ListReviewAsync(string sortOrder, string currentFilter, int reviewStatus, int? page)
         {
