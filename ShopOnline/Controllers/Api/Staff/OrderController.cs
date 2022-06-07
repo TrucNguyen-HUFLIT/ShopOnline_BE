@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
-using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.HistoryOrder;
 using ShopOnline.Core.Models.Order;
 using System.Threading.Tasks;

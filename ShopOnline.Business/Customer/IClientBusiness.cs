@@ -20,6 +20,7 @@ namespace ShopOnline.Business.Customer
         Task<IEnumerable<ProductDetailModel>> GetPopularProductsAsync();
         Task<IEnumerable<ProductDetailModel>> GetFavoriteProductsAsync();
         Task<ProductModel> GetProductByIdDetailAsync(int idProductDetail);
-
+        Task<IEnumerable<ProductDetailModel>> GetProductsByIdBrandAsync(int idBrand);
+        Task<IEnumerable<ProductDetailModel>> GetProductsByFilterAsync(string searchTerm);
     }
 }

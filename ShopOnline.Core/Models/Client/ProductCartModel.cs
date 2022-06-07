@@ -26,6 +26,21 @@ namespace ShopOnline.Core.Models.Client
         public ProductSize Size { get; set; }
     }
 
+    public class CheckOutCartRequestModel
+    {
+        public IEnumerable<ProductCheckOutModel> ProductCheckOutModels { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; }
+
+        public string Address { get; set; }
+    }
+
+    public class ProductCheckOutModel
+    {
+        public int Id { get; set; }
+        public int Quantity { get; set; }
+    }
+
     public class ProductCartViewModel
     {
         public IEnumerable<ProductCartModel> ProductCarts { get; set; }

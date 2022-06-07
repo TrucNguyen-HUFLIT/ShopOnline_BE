@@ -18,5 +18,7 @@ namespace ShopOnline.Business
 
         Task<ChangePassword> GetInforUserChangePassword(ClaimsPrincipal user);
         Task<bool> ChangePasswordUser(ChangePassword changePassword);
+        Task<UserInforModel> GetUserInforCustomerAsync();
+        Task<UserInforModel> UpdateUserInforCustomerAsync(UserInforModel model);
     }
 }

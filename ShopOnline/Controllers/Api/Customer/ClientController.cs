@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ShopOnline.Business;
 using ShopOnline.Business.Customer;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
 using ShopOnline.Core.Helpers;
-using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Client;
 using ShopOnline.Core.Models.HistoryOrder;
 using ShopOnline.Core.Models.Mobile;
@@ -82,19 +80,10 @@ namespace ShopOnline.Controllers.Customer
             return Ok(productsBrandPageViewModel);
         }
 
+        [HttpGet("order-history")]
         [AuthorizeFilter(TypeAcc.Customer)]
-        [HttpGet("ListHistoryOrderCustomer")]
-        public async Task<IActionResult> ListHistoryOrderCustomerAsync(string sortOrder, string currentFilter, int? page)
-        {
-            //ViewBag.CurrentSort = sortOrder;
-
-            var model = new HistoryOrderModel
-            {
-                ListHistoryOrder = await _orderBusiness.GetHistoryOrderCustomerAsync(sortOrder, currentFilter, page, User)
-            };
-
-            return Ok(model);
-        }
+        public async Task<IEnumerable<HistoryOrderInfor>> ListHistoryOrderCustomerAsync(string sortOrder, string currentFilter, int? page)
+        => await _orderBusiness.GetHistoryOrderCustomerAsync();
 
         [HttpGet("brands")]
         [AllowAnonymous]
@@ -131,6 +120,24 @@ namespace ShopOnline.Controllers.Customer
             var favoriteProducts = await _clientBusiness.GetFavoriteProductsAsync();
 
             return favoriteProducts;
+        }
+
+        [HttpGet("products-by-id-brand")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<ProductDetailModel>> GetProductsByIdBrand(int idBrand)
+        {
+            var products = await _clientBusiness.GetProductsByIdBrandAsync(idBrand);
+
+            return products;
+        }
+
+        [HttpGet("products-by-filter")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<ProductDetailModel>> GetProductsByFilter(string searchTerm)
+        {
+            var products = await _clientBusiness.GetProductsByFilterAsync(searchTerm);
+
+            return products;
         }
     }
 }

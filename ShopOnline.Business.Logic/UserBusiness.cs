@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using ShopOnline.Core;
-using ShopOnline.Core.Constants;
 using ShopOnline.Core.Entities;
 using ShopOnline.Core.Exceptions;
 using ShopOnline.Core.Helper;
@@ -24,13 +23,15 @@ namespace ShopOnline.Business.Logic
     {
         private readonly MyDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
-
+        private readonly ICurrentUserService _currentUserService;
 
         public UserBusiness(MyDbContext context,
-                            IWebHostEnvironment hostEnvironment)
+                            IWebHostEnvironment hostEnvironment,
+                            ICurrentUserService currentUserService)
         {
             _context = context;
             _hostEnvironment = hostEnvironment;
+            _currentUserService = currentUserService;
         }
 
         public async Task<AccessTokenModel> LoginAsync(AccountLoginModel accountLogin)
@@ -535,6 +536,51 @@ namespace ShopOnline.Business.Logic
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<UserInforModel> GetUserInforCustomerAsync()
+        {
+            var currentUser = _currentUserService.Current;
+            var userInfo = new UserInforModel();
+
+            if (currentUser != null)
+            {
+                userInfo = await _context.Customers
+                    .Where(x => !x.IsDeleted && x.Id == currentUser.UserId)
+                    .Select(x => new UserInforModel
+                    {
+                        Id = x.Id,
+                        Address = x.Address,
+                        Avatar = x.Avatar,
+                        Email = x.Email,
+                        FullName = x.FullName,
+                        PhoneNumber = x.PhoneNumber
+                    })
+                    .FirstOrDefaultAsync();
+            }
+
+            return userInfo;
+        }
+
+        public async Task<UserInforModel> UpdateUserInforCustomerAsync(UserInforModel model)
+        {
+            var userInfo = await _context.Customers
+                .Where(x => !x.IsDeleted && x.Id == model.Id)
+                .FirstOrDefaultAsync();
+
+            if (userInfo == null)
+                throw new UserFriendlyException(ErrorCode.NotFoundUser);
+
+            userInfo.Address = model.Address;
+            userInfo.Avatar = model.Avatar;
+            userInfo.Email = model.Email;
+            userInfo.FullName = model.FullName;
+            userInfo.PhoneNumber = model.PhoneNumber;
+
+            _context.Customers.Update(userInfo);
+            await _context.SaveChangesAsync();
+
+            return model;
         }
 
         private AccessTokenModel GenericAccessToken(List<Claim> claims)

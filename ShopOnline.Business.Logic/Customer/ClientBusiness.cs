@@ -279,7 +279,7 @@ namespace ShopOnline.Business.Logic.Customer
                     Id = x.IdProductDetail,
                     Name = x.Name,
                     PriceVND = x.ProductDetail.Price,
-                    Pic = x.ProductDetail.Pic1
+                    Pic = x.ProductDetail.Pic1.Replace("Product", "Mobile")
                 })
                 .Distinct()
                 .ToListAsync();
@@ -313,9 +313,9 @@ namespace ShopOnline.Business.Logic.Customer
                     Id = x.Id,
                     Name = x.Name,
                     PriceVND = x.Price,
-                    Pic = x.Pic1,
-                    Pic2 = x.Pic2,
-                    Pic3 = x.Pic3,
+                    Pic = x.Pic1.Replace("Product", "Mobile"),
+                    Pic2 = x.Pic2.Replace("Product", "Mobile"),
+                    Pic3 = x.Pic3.Replace("Product", "Mobile"),
                     Description = x.Description,
                     ProductSizes = x.Products
                         .Where(y => !y.IsDeleted && y.Quantity > 0)
@@ -353,17 +353,16 @@ namespace ShopOnline.Business.Logic.Customer
                     .Select(x => x.IdProductDetail)
                     .ToListAsync();
 
-            var favoriteProducts = await _context.Products
+            var favoriteProducts = await _context.ProductDetails
                 .Where(x => !x.IsDeleted
-                    && !x.ProductDetail.IsDeleted
-                    && favoriteProductDetailIds.Contains(x.IdProductDetail)
-                    && x.ProductDetail.Status == ProductStatus.Available)
+                    && favoriteProductDetailIds.Contains(x.Id)
+                    && x.Status == ProductStatus.Available)
                 .Select(x => new ProductDetailModel
                 {
-                    Id = x.IdProductDetail,
+                    Id = x.Id,
                     Name = x.Name,
-                    PriceVND = x.ProductDetail.Price,
-                    Pic = x.ProductDetail.Pic1,
+                    PriceVND = x.Price,
+                    Pic = x.Pic1.Replace("Product", "Mobile"),
                     IsFavorite = true
                 })
                 .Distinct()
@@ -375,6 +374,80 @@ namespace ShopOnline.Business.Logic.Customer
             }
 
             return favoriteProducts;
+        }
+
+        public async Task<IEnumerable<ProductDetailModel>> GetProductsByIdBrandAsync(int idBrand)
+        {
+            var userId = _currentUserService.Current?.UserId;
+            var productOfBrand = await _context.ProductDetails
+                .Where(x => !x.IsDeleted && x.ProductType.IdBrand == idBrand && x.Status == ProductStatus.Available)
+                .Select(x => new ProductDetailModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PriceVND = x.Price,
+                    Pic = x.Pic1.Replace("Product", "Mobile"),
+                })
+                .Distinct()
+                .ToListAsync();
+
+            var favoriteProductDetailIds = new List<int>();
+
+            if (userId != null)
+            {
+                favoriteProductDetailIds = await _context.FavoriteProducts
+                    .Where(x => !x.IsDeleted && x.IdCustomer == userId)
+                    .Select(x => x.IdProductDetail)
+                    .ToListAsync();
+            }
+
+            foreach (var product in productOfBrand)
+            {
+                product.IsFavorite = favoriteProductDetailIds.Contains(product.Id);
+                product.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.PriceVND);
+            }
+
+            return productOfBrand;
+        }
+
+        public async Task<IEnumerable<ProductDetailModel>> GetProductsByFilterAsync(string searchTerm)
+        {
+            var userId = _currentUserService.Current?.UserId;
+            var productOfBrand = await _context.ProductDetails
+                .Where(x => !x.IsDeleted && x.Status == ProductStatus.Available
+                        && (
+                            x.Name.ToLower().Contains(searchTerm.ToLower())
+                        || x.ProductType.Name.ToLower().Contains(searchTerm.ToLower())
+                        || x.ProductType.Brand.Name.ToLower().Contains(searchTerm.ToLower())
+                            )
+                        )
+                .Select(x => new ProductDetailModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PriceVND = x.Price,
+                    Pic = x.Pic1.Replace("Product", "Mobile"),
+                })
+                .Distinct()
+                .ToListAsync();
+
+            var favoriteProductDetailIds = new List<int>();
+
+            if (userId != null)
+            {
+                favoriteProductDetailIds = await _context.FavoriteProducts
+                    .Where(x => !x.IsDeleted && x.IdCustomer == userId)
+                    .Select(x => x.IdProductDetail)
+                    .ToListAsync();
+            }
+
+            foreach (var product in productOfBrand)
+            {
+                product.IsFavorite = favoriteProductDetailIds.Contains(product.Id);
+                product.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.PriceVND);
+            }
+
+            return productOfBrand;
         }
     }
 }
