@@ -1,6 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using ShopOnline.Core.Appsetting;
-using ShopOnline.Core.Constants;
 using ShopOnline.Core.Models;
 using System;
 using System.Collections.Generic;

@@ -26,7 +26,7 @@ namespace ShopOnline.Infrastructure.Extensions
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
-         
+
             services.AddScoped<IUserBusiness, UserBusiness>();
             services.AddScoped<IClientBusiness, ClientBusiness>();
             services.AddScoped<IStaffBusiness, StaffBusiness>();

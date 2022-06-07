@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Customer;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
-using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Product;
 using System;
 using System.Linq;

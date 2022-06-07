@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
@@ -59,5 +58,16 @@ namespace ShopOnline.Controllers
             await _userBusiness.ChangePasswordUser(changePassword);
             return Ok();
         }
+
+        [HttpGet("customer")]
+        [AuthorizeFilter]
+        public async Task<UserInforModel> GetUserInforCustomer()
+        => await _userBusiness.GetUserInforCustomerAsync();
+
+        [HttpPut("customer")]
+        [AuthorizeFilter]
+        public async Task<UserInforModel> UpdateUserInforCustomer(UserInforModel model)
+        => await _userBusiness.UpdateUserInforCustomerAsync(model);
+
     }
 }

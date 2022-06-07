@@ -5,13 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Models.Account;
-using ShopOnline.Infrastructure.Helper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Controllers
 {
@@ -67,13 +61,8 @@ namespace ShopOnline.Controllers
             }
         }
 
-        [HttpGet("ResetPassword")]
-        public IActionResult ResetPassword()
-        {
-            return Ok("ResetPassword");
-        }
-
-        [HttpPost("ResetPassword")]
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
         public async Task ResetPassword(ResetPasswordModel resetPasswordModel)
         {
             await _userBusiness.ResetPasswordAsync(resetPasswordModel);

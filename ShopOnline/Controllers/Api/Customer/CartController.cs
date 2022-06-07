@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business;
 using ShopOnline.Business.Customer;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
-using ShopOnline.Core.Models;
 using ShopOnline.Core.Models.Client;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
@@ -52,6 +50,14 @@ namespace ShopOnline.Controllers.Customer
         {
             int newOrderId = await _cartBusiness.CheckOutAsync(User, paymentMethod, address);
             return Ok(newOrderId);
+        }
+
+        [AuthorizeFilter(TypeAcc.Customer)]
+        [HttpPost("check-out")]
+        public async Task<IActionResult> CheckOutAsync(CheckOutCartRequestModel model)
+        {
+            await _cartBusiness.CheckOutAsync(model);
+            return Ok();
         }
 
         [AuthorizeFilter(TypeAcc.Customer)]

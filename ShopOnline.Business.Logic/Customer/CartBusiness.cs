@@ -25,12 +25,16 @@ namespace ShopOnline.Business.Logic.Customer
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly MyDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
         private ISession _session => _httpContextAccessor.HttpContext.Session;
+
         public CartBusiness(IHttpContextAccessor httpContextAccessor,
-                            MyDbContext context)
+                            MyDbContext context,
+                            ICurrentUserService currentUserService)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+            _currentUserService = currentUserService;
         }
 
         public List<ProductCartModel> GetProductsCart()
@@ -201,6 +205,91 @@ namespace ShopOnline.Business.Logic.Customer
             }
         }
 
+        public async Task CheckOutAsync(CheckOutCartRequestModel model)
+        {
+            var currentUser = _currentUserService.Current;
+            string email = currentUser.Email;
+            string phone = currentUser.Phone;
+            var orderDetails = new List<OrderDetailEntity>();
+            if (!model.ProductCheckOutModels.Any()) throw new UserFriendlyException(ErrorCode.EmptyCart);
+
+            var productIds = model.ProductCheckOutModels.Select(x => x.Id).ToArray();
+            var products = await _context.Products.Where(x => !x.IsDeleted && productIds.Contains(x.Id)).Include(x => x.ProductDetail).ToArrayAsync();
+            var customer = await _context.Customers
+                                    .Where(x => !x.IsDeleted && x.Email == email && x.PhoneNumber == phone)
+                                    .Select(x => new InforAccount
+                                    {
+                                        Id = x.Id,
+                                        Email = x.Email,
+                                        FullName = x.FullName,
+                                    })
+                                    .FirstOrDefaultAsync();
+            var cart = new List<ProductCartModel>();
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                OrderEntity orderEntity = new()
+                {
+                    OrderDay = DateTime.Now,
+                    StatusOrder = StatusOrder.Processing,
+                    IdCustomer = customer.Id,
+                    Address = model.Address,
+                    IsPaid = false,
+                    Payment = model.PaymentMethod,
+                    ExtraFee = products.Sum(x => x.ProductDetail.Price) > 5000000 ? 0 : 5000000,
+                };
+                _context.Orders.Add(orderEntity);
+                await _context.SaveChangesAsync();
+
+                foreach (var product in products)
+                {
+                    var quantitySelected = model.ProductCheckOutModels.Where(x => x.Id == product.Id).Select(x=>x.Quantity).FirstOrDefault();
+                    int newQuantity = product.Quantity - quantitySelected;
+
+                    if (newQuantity < 0)
+                    {
+                        transaction.Rollback();
+                        throw new UserFriendlyException(ErrorCode.OutOfStock);
+                    }
+                    else
+                    {
+                        product.Quantity = newQuantity;
+                    }
+                    _context.Products.Update(product);
+
+                    var totalPrice = product.ProductDetail.Price * quantitySelected;
+                    var totalBasePrice = product.ProductDetail.BasePrice * quantitySelected;
+
+                    cart.Add(new ProductCartModel
+                    {
+                        Id = product.Id,
+                        TotalBasePrice = totalBasePrice,
+                        TotalVND = totalPrice,
+                        TotalUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(totalPrice),
+                        Size = product.Size,
+                        Name = product.Name,
+                        SelectedQuantity = quantitySelected,
+                        PriceVND = product.ProductDetail.Price,
+                        BasePrice = product.ProductDetail.BasePrice,
+                        PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.ProductDetail.Price),
+                    });
+
+                    orderDetails.Add(new OrderDetailEntity
+                    {
+                        IdOrder = orderEntity.Id,
+                        IdProduct = product.Id,
+                        TotalPrice = totalPrice,
+                        TotalBasePrice = totalBasePrice,
+                        QuantityPurchased = quantitySelected,
+                    });
+                }
+                _context.OrderDetails.AddRange(orderDetails);
+                await SendEmailConfirm(customer, cart, orderEntity.Id, model.Address);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+            }
+        }
+
         public async Task SendEmailConfirm(InforAccount infor, List<ProductCartModel> productCarts, int idOrder, string address)
         {
             MimeMessage message = new MimeMessage();
@@ -267,7 +356,7 @@ namespace ShopOnline.Business.Logic.Customer
                         $"<td style=\"border: 1px solid #dddddd; text-align: left; padding: 8px;\">{product.Id}</td> " +
                         $"<td style=\"border: 1px solid #dddddd; text-align: left; padding: 8px;\">{product.Name}</td> " +
                         $"<td style=\"border: 1px solid #dddddd; text-align: left; padding: 8px;\">{product.SelectedQuantity}</td> " +
-                        $"<td style=\"border: 1px solid #dddddd; text-align: left; padding: 8px;\">{product.Size}</td> " +
+                        $"<td style=\"border: 1px solid #dddddd; text-align: left; padding: 8px;\">{(int)product.Size}</td> " +
                         $"<td style=\"border: 1px solid #dddddd; text-align: left; padding: 8px;\">{string.Format("{0:N0}", product.PriceVND)}đ - ${string.Format("{0:N0}", product.PriceUSD)}</td> " +
                     "</tr>";
                 productsInfor.Append(newRow);
@@ -285,7 +374,8 @@ namespace ShopOnline.Business.Logic.Customer
                 SmtpClient client = new();
                 //connect (smtp address, port , true)
                 await client.ConnectAsync("smtp.gmail.com", 465, true);
-                await client.AuthenticateAsync("dreamsstore.ss@gmail.com", "4thanggay");
+                //await client.AuthenticateAsync("dreamsstore.ss@gmail.com", "4thanggay");
+                await client.AuthenticateAsync("dreamsstore.ss@gmail.com", "pbyqqvmlkutbkavj");
 
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);

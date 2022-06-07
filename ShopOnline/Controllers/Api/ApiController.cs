@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Core.Filters;
-using ShopOnline.Core.Models;
-using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Controllers.Api
 {

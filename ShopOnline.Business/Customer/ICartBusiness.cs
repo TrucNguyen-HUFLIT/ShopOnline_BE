@@ -10,6 +10,7 @@ namespace ShopOnline.Business.Customer
     {
         Task AddProductToCartAsync(int idProduct, int quantity);
         Task<int> CheckOutAsync(ClaimsPrincipal user, AppEnum.PaymentMethod paymentMethod, string address);
+        Task CheckOutAsync(CheckOutCartRequestModel model);
         Task<OrderInfor> GetOrderById(int id);
         List<ProductCartModel> GetProductsCart();
         Task ReduceProductFromCartAsync(int idProduct, int? quantity);

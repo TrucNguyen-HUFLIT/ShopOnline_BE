@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopOnline.Business.Staff;
 using ShopOnline.Core;
+using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models.Enum;
 using ShopOnline.Core.Models.HistoryOrder;
 using ShopOnline.Core.Models.Order;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,9 +17,13 @@ namespace ShopOnline.Business.Logic.Staff
     public class OrderBusiness : IOrderBusiness
     {
         private readonly MyDbContext _context;
-        public OrderBusiness(MyDbContext context)
+        private readonly ICurrentUserService _currentUserService;
+
+        public OrderBusiness(MyDbContext context,
+            ICurrentUserService currentUserService)
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
 
         public async Task<IPagedList<OrderInfor>> GetListOrderAsync(string sortOrder, StatusOrder statusOrder, int? page)
@@ -58,18 +64,11 @@ namespace ShopOnline.Business.Logic.Staff
             return listOrder.ToPagedList(pageNumber, pageSize);
         }
 
-        public async Task<IPagedList<HistoryOrderInfor>> GetHistoryOrderCustomerAsync(string sortOrder, string currentFilter, int? page, ClaimsPrincipal user)
+        public async Task<IEnumerable<HistoryOrderInfor>> GetHistoryOrderCustomerAsync()
         {
-            string email = user.FindFirst(ClaimTypes.Email).Value;
-            var customerId = _context.Customers.Where(x => x.Email == email && !x.IsDeleted).Select(x => x.Id).FirstOrDefault();
+            var customerId = _currentUserService.Current.UserId;
 
-            var listHistoryOrderQuery = _context.Orders.Where(x => !x.IsDeleted && x.IdCustomer == customerId);
-
-            listHistoryOrderQuery = sortOrder switch
-            {
-                "order_day" => listHistoryOrderQuery.OrderBy(x => x.OrderDay),
-                _ => listHistoryOrderQuery.OrderByDescending(x => x.OrderDay),
-            };
+            var listHistoryOrderQuery = _context.Orders.Where(x => !x.IsDeleted && x.IdCustomer == customerId).OrderByDescending(x => x.OrderDay);
 
             var listHistoryOrder = await listHistoryOrderQuery
                 .Select(historyOrder => new HistoryOrderInfor
@@ -85,9 +84,12 @@ namespace ShopOnline.Business.Logic.Staff
                 })
                 .ToListAsync();
 
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-            return listHistoryOrder.ToPagedList(pageNumber, pageSize);
+            foreach (var order in listHistoryOrder)
+            {
+                order.TotalPrice = await ConvertCurrencyHelper.ConvertVNDToUSD(order.TotalPrice);
+            }
+
+            return listHistoryOrder;
         }
 
         public async Task<IPagedList<HistoryOrderShipperInfor>> GetHistoryOrderShipperAsync(string sortOrder, string currentFilter, int? page, ClaimsPrincipal user)
