@@ -139,5 +139,12 @@ namespace ShopOnline.Controllers.Customer
 
             return products;
         }
+
+        [HttpPost("favorite/{idProductDetail}")]
+        [AuthorizeFilter(TypeAcc.Customer)]
+        public async Task FavoriteProduct(int idProductDetail)
+        {
+            await _clientBusiness.FavoriteProductAsync(idProductDetail);
+        }
     }
 }

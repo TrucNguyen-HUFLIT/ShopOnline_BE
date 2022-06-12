@@ -449,5 +449,30 @@ namespace ShopOnline.Business.Logic.Customer
 
             return productOfBrand;
         }
+
+        public async Task FavoriteProductAsync(int idProductDetail)
+        {
+            var userId = _currentUserService.Current.UserId;
+
+            var favoriteProduct = await _context.FavoriteProducts
+                .Where(x => x.IdProductDetail == idProductDetail && x.IdCustomer == userId)
+                .FirstOrDefaultAsync();
+
+            if (favoriteProduct == null)
+            {
+                _context.FavoriteProducts.Add(new FavoriteProductEntity
+                {
+                    IdCustomer = userId,
+                    IdProductDetail = idProductDetail
+                });
+            }
+            else
+            {
+                favoriteProduct.IsDeleted = !favoriteProduct.IsDeleted;
+                _context.FavoriteProducts.Update(favoriteProduct);
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
