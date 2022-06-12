@@ -22,5 +22,6 @@ namespace ShopOnline.Business.Customer
         Task<ProductModel> GetProductByIdDetailAsync(int idProductDetail);
         Task<IEnumerable<ProductDetailModel>> GetProductsByIdBrandAsync(int idBrand);
         Task<IEnumerable<ProductDetailModel>> GetProductsByFilterAsync(string searchTerm);
+        Task FavoriteProductAsync(int idProductDetail);
     }
 }
