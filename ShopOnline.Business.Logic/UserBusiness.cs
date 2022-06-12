@@ -189,7 +189,8 @@ namespace ShopOnline.Business.Logic
                 SmtpClient client = new();
                 //connect (smtp address, port , true)
                 await client.ConnectAsync("smtp.gmail.com", 465, true);
-                await client.AuthenticateAsync("dreamsstore.ss@gmail.com", "4thanggay");
+                //await client.AuthenticateAsync("dreamsstore.ss@gmail.com", "4thanggay");
+                await client.AuthenticateAsync("dreamsstore.ss@gmail.com", "pbyqqvmlkutbkavj");
 
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
