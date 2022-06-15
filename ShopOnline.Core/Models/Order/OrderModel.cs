@@ -1,4 +1,5 @@
 ﻿using ShopOnline.Core.Models.Customer;
+using ShopOnline.Core.Validators.Paging;
 using System;
 using System.Collections.Generic;
 using X.PagedList;
@@ -23,6 +24,12 @@ namespace ShopOnline.Core.Models.Order
         public bool IsPaid { get; set; }
         public PaymentMethod Payment { get; set; }
         public string Address { get; set; }
+    }
+
+    public class OrderParamsModel : PagedCollectionParametersModel
+    {
+        public bool IsDescending { get; set; }
+        public OrderSortByEnum SortBy { get; set; }
     }
 
     public class OrderInforShipperModel

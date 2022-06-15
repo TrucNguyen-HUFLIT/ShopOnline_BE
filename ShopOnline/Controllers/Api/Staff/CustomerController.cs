@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Models.Customer;
+using ShopOnline.Core.Validators.Paging;
 using System.Threading.Tasks;
 
 namespace ShopOnline.Controllers.Staff
@@ -15,23 +17,11 @@ namespace ShopOnline.Controllers.Staff
             _customerBusiness = customerBusiness;
         }
 
-        [HttpGet("ListCustomer")]
-        public async Task<IActionResult> ListCustomer(string sortOrder, string currentFilter, string searchString, int? page)
+        [HttpGet("")]
+        public async Task<PagedCollectionResultModel<CustomerInfor>> ListCustomer([FromQuery] CustomerParamsModel model)
         {
-            //ViewBag.CurrentSort = sortOrder;
-            //ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) || sortOrder.Equals("name") ? "name_desc" : "name";
-
-            //ViewBag.IdSortParm = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
-
-            if (searchString != null) page = 1;
-            else searchString = currentFilter;
-            //ViewBag.CurrentFilter = searchString;
-
-            var model = new CustomerModel
-            {
-                ListCustomer = await _customerBusiness.GetListCustomerAsync(sortOrder, currentFilter, searchString, page)
-            };
-            return Ok(model);
+            var customers = await _customerBusiness.GetListCustomerAsync(model);
+            return customers;
         }
 
     }

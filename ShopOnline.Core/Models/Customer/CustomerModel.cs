@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using ShopOnline.Core.Validators.Paging;
 using System.ComponentModel.DataAnnotations.Schema;
 using X.PagedList;
+using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Core.Models.Customer
 {
@@ -20,5 +22,11 @@ namespace ShopOnline.Core.Models.Customer
 
         [NotMapped]
         public IFormFile UploadAvt { get; set; }
+    }
+
+    public class CustomerParamsModel: PagedCollectionParametersModel
+    {
+        public bool IsDescending { get; set; }
+        public CustomerSortByEnum SortBy { get; set; }
     }
 }

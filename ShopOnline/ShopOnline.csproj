@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.16">
       <PrivateAssets>all</PrivateAssets>
@@ -18,6 +19,10 @@
     <ProjectReference Include="..\ShopOnline.Business.Logic\ShopOnline.Business.Logic.csproj" />
     <ProjectReference Include="..\ShopOnline.Business\ShopOnline.Business.csproj" />
     <ProjectReference Include="..\ShopOnline.Core\ShopOnline.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Appsetting\" />
   </ItemGroup>
 
 </Project>

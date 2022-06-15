@@ -25,7 +25,7 @@ namespace ShopOnline.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
-        public async Task<AccessTokenModel> Login(AccountLoginModel accountLogin)
+        public async Task<AccessTokenModel> Login([FromBody]AccountLoginModel accountLogin)
         {
             return await _userBusiness.LoginAsync(accountLogin);
         }

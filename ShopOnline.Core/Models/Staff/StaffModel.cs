@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using ShopOnline.Core.Validators.Paging;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using X.PagedList;
@@ -52,5 +53,11 @@ namespace ShopOnline.Core.Models.Staff
     {
         [NotMapped]
         public IFormFile UploadAvt { get; set; }
+    }
+
+    public class StaffParamsModel: PagedCollectionParametersModel
+    {
+        public bool IsDescending { get; set; }
+        public CustomerSortByEnum SortBy { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models.Enum;
 using ShopOnline.Core.Models.HistoryOrder;
 using ShopOnline.Core.Models.Order;
+using ShopOnline.Core.Validators.Paging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -202,6 +203,58 @@ namespace ShopOnline.Business.Logic.Staff
             }
             _context.UpdateRange(productOrderDetails.Select(x => x.Product).ToArray());
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<PagedCollectionResultModel<OrderInfor>> GetListOrdersAsync(OrderParamsModel model)
+        {
+            var ordersQuery = _context.Orders.Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(model.Terms))
+            {
+                var termsNormalize = model.Terms.Trim().ToUpperInvariant();
+                ordersQuery = ordersQuery.Where(x => x.Id.ToString() == termsNormalize
+                                            || x.Address.Contains(termsNormalize));
+            }
+
+            switch (model.SortBy)
+            {
+                case OrderSortByEnum.Id:
+                    ordersQuery = model.IsDescending
+                         ? ordersQuery.OrderByDescending(x => x.Id)
+                         : ordersQuery.OrderBy(x => x.Id);
+                    break;
+                case OrderSortByEnum.OrderDate:
+                    ordersQuery = model.IsDescending
+                         ? ordersQuery.OrderByDescending(x => x.OrderDay)
+                         : ordersQuery.OrderBy(x => x.OrderDay);
+                    break;
+                default:
+                    ordersQuery = model.IsDescending
+                         ? ordersQuery.OrderByDescending(x => x.OrderDay)
+                         : ordersQuery.OrderBy(x => x.OrderDay);
+                    break;
+            }
+
+            var totalRecord = ordersQuery.Count();
+
+            var orders = await ordersQuery.Select(x => new OrderInfor
+            {
+                Id = x.Id,
+                Address = x.Address,
+                StatusOrder = x.StatusOrder,
+                Payment = x.Payment,
+                OrderDay = x.OrderDay,
+                TotalPrice = x.OrderDetails.Sum(y => y.TotalPrice),
+            }).Skip(model.Skip).Take(model.Take).ToListAsync();
+
+            return new PagedCollectionResultModel<OrderInfor>
+            {
+                Skip = model.Skip,
+                Take = model.Take,
+                Total = totalRecord,
+                Result = orders,
+                Terms = model.Terms
+            };
         }
     }
 }

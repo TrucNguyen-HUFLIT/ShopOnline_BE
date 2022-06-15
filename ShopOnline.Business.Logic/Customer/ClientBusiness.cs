@@ -7,6 +7,7 @@ using ShopOnline.Core.Helpers;
 using ShopOnline.Core.Models.Client;
 using ShopOnline.Core.Models.Enum;
 using ShopOnline.Core.Models.Mobile;
+using ShopOnline.Core.Validators.Paging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,7 +104,8 @@ namespace ShopOnline.Business.Logic.Customer
                                                                 Id = y.Id,
                                                                 Quantity = y.Quantity,
                                                                 ProductSize = y.Size,
-                                                                IsAvailable = true
+                                                                IsAvailable = true,
+                                                                Size = (int)y.Size,
                                                             })
                                                             .ToList(),
                                             ReviewsDetail = x.ReviewDetails
@@ -448,6 +450,74 @@ namespace ShopOnline.Business.Logic.Customer
             }
 
             return productOfBrand;
+        }
+
+        public async Task<ProductsViewModel> GetListProductOfBrandAsync(ProductParamsModel model)
+        {
+            var productsQuery = _context.ProductDetails.Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(model.Terms))
+            {
+                var termsNormalize = model.Terms.Trim().ToUpperInvariant();
+                productsQuery = productsQuery.Where(x => x.Id.ToString() == termsNormalize
+                                            || x.Name.Contains(termsNormalize));
+            }
+
+            if(model.TypeId != null)
+            {
+                productsQuery = productsQuery.Where(x => x.IdProductType == model.TypeId);
+            }    
+
+            if(model.BrandId != 0)
+            {
+                productsQuery = productsQuery.Where(x => x.ProductType.IdBrand == model.BrandId);
+            }    
+
+            switch (model.SortBy)
+            {
+                case ProductSortByEnum.Name:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Name)
+                         : productsQuery.OrderBy(x => x.Name);
+                    break;
+                case ProductSortByEnum.Id:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Id)
+                         : productsQuery.OrderBy(x => x.Id);
+                    break;
+                case ProductSortByEnum.Price:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Price)
+                         : productsQuery.OrderBy(x => x.Price);
+                    break;
+                default:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Id)
+                         : productsQuery.OrderBy(x => x.Id);
+                    break;
+            }
+
+            var totalRecord = productsQuery.Count();
+
+            var productsInfor = await productsQuery.Select(x => new ProductInforModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                PriceVND = x.Price,
+                Pic = x.Pic1
+            })
+            .Skip(model.Skip).Take(model.Take).ToListAsync();
+
+            foreach (var product in productsInfor)
+            {
+                product.PriceUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(product.PriceVND);
+            }
+
+            return new ProductsViewModel
+            {
+                AmountProduct = totalRecord,
+                ProductsInfor = productsInfor
+            };
         }
 
         public async Task FavoriteProductAsync(int idProductDetail)

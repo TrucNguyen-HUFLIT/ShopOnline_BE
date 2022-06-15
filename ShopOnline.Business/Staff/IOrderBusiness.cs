@@ -1,5 +1,6 @@
 ﻿using ShopOnline.Core.Models.HistoryOrder;
 using ShopOnline.Core.Models.Order;
+using ShopOnline.Core.Validators.Paging;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -17,5 +18,7 @@ namespace ShopOnline.Business.Staff
         Task ShipperChangeStatusOrderAsync(int id, StatusOrder statusOrder, ClaimsPrincipal user);
         Task StaffChangeStatusOrderAsync(int id, StatusOrder statusOrder);
         Task SetIsPaidOrderAsync(int id, bool isPaid);
+
+        Task<PagedCollectionResultModel<OrderInfor>> GetListOrdersAsync(OrderParamsModel model);
     }
 }
