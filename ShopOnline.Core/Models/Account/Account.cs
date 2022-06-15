@@ -32,9 +32,8 @@ namespace ShopOnline.Core.Models.Account
         public string FullName { get; set; }
 
         public string PhoneNumber { get; set; }
+        public string Address { get; set; }
 
-        [DataType(DataType.Password)]
-        public string ConfirmPassword { get; set; }
     }
 
     public class ResetPasswordModel

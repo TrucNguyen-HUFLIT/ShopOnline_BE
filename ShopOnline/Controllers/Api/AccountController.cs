@@ -43,22 +43,10 @@ namespace ShopOnline.Controllers
             return Ok("Register");
         }
 
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register(AccountRegisterModel accountRegister)
+        [HttpPost("register")]
+        public async Task Register(AccountRegisterModel accountRegister)
         {
-            bool isSuccess = await _userBusiness.RegisterAsync(accountRegister);
-            if (isSuccess)
-            {
-                return Created("/Login", new AccountLoginModel
-                {
-                    Email = accountRegister.Email,
-                    Password = accountRegister.Password
-                });
-            }
-            else
-            {
-                return BadRequest();
-            }
+            await _userBusiness.RegisterAsync(accountRegister);
         }
 
         [HttpPost("reset-password")]
