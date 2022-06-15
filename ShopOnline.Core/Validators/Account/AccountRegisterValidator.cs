@@ -11,8 +11,6 @@ namespace ShopOnline.Core.Validators.Account
             RuleFor(actor => actor.FullName).NotEmpty();
             RuleFor(actor => actor.PhoneNumber).NotEmpty();
             RuleFor(actor => actor.Password).NotEmpty();
-            RuleFor(actor => actor.ConfirmPassword).NotEmpty();
-            RuleFor(actor => actor.ConfirmPassword).Equal(actor => actor.Password).WithMessage("Confirm password didn't match");
         }
     }
 }
