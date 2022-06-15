@@ -122,8 +122,10 @@ namespace ShopOnline.Business.Logic
             return GenericAccessToken(claims);
         }
 
-        public async Task<bool> RegisterAsync(AccountRegisterModel accountRegister)
+        public async Task RegisterAsync(AccountRegisterModel accountRegister)
         {
+            accountRegister.Email = accountRegister.Email.ToLower();
+
             bool isExistingEmail = await _context.Customers.AnyAsync(x => x.Email == accountRegister.Email);
 
             if (isExistingEmail)
@@ -140,13 +142,12 @@ namespace ShopOnline.Business.Logic
                 Password = HashPasswordHelper.DoHash(accountRegister.Password),
                 TypeAcc = TypeAcc.Customer,
                 Avatar = "/img/Avatar/avatar-icon-images-4.jpg",
-                Address = ""
+                Address = accountRegister.Address
             };
 
             _context.Customers.Add(newAccountCustomer);
             await _context.SaveChangesAsync();
 
-            return true;
         }
 
         public async Task ResetPasswordAsync(ResetPasswordModel resetPasswordModel)

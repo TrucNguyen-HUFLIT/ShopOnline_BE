@@ -11,7 +11,7 @@ namespace ShopOnline.Business
         UserInfor LoadInforUser(ClaimsPrincipal user);
         Task<AccessTokenModel> LoginAsync(AccountLoginModel accountLogin);
 
-        Task<bool> RegisterAsync(AccountRegisterModel accountRegister);
+        Task RegisterAsync(AccountRegisterModel accountRegister);
 
         Task ResetPasswordAsync(ResetPasswordModel resetPasswordModel);
         Task<bool> UpdateProfileAsync(UserInfor userInfor);
