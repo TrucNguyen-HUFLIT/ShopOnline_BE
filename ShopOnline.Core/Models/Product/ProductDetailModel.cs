@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ShopOnline.Core.Validators.Paging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,10 +26,19 @@ namespace ShopOnline.Core.Models.Product
         public string Pic3 { get; set; }
         public int Price { get; set; }
         public int BasePrice { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public ProductStatus Status { get; set; }
         [Display(Name = "Type")]
         public int IdProductType { get; set; }
         public string Description { get; set; }
+        public string ProductTypeName { get; set; }
+    }
+
+    public class ProductDetailParamsModel: PagedCollectionParametersModel
+    {
+        public bool IsDescending { get; set; }
+        public ProductSortByEnum SortBy { get; set; }
     }
 
     public class ProductDetailCreate : ProductDetailInfor

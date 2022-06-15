@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Customer;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
 using ShopOnline.Core.Models.Product;
+using ShopOnline.Core.Validators.Paging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,8 +25,9 @@ namespace ShopOnline.Controllers.Staff
             _clientBusiness = clientBusiness;
         }
 
-        [AuthorizeFilter(TypeAcc.Manager)]
+        //[AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("ListBrand")]
+        [AllowAnonymous]
         public async Task<IActionResult> ListBrand(string sortOrder, string currentFilter, string searchString, int? page)
         {
             //ViewBag.CurrentSort = sortOrder;
@@ -38,11 +41,11 @@ namespace ShopOnline.Controllers.Staff
             else searchString = currentFilter;
             //ViewBag.CurrentFilter = searchString;
 
-            var model = new BrandModel
-            {
-                ListBrand = await _productBusiness.GetListBrandAsync(sortOrder, currentFilter, searchString, page)
-            };
-            return Ok(model);
+            //var model = new BrandModel
+            //{
+            //    ListBrand = await _productBusiness.GetListBrandAsync(sortOrder, currentFilter, searchString, page)
+            //};
+            return Ok(await _productBusiness.GetListBrandAsync(sortOrder, currentFilter, searchString, page));
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
@@ -245,6 +248,13 @@ namespace ShopOnline.Controllers.Staff
             };
 
             return Ok(model);
+        }
+
+        [HttpGet("")]
+        public async Task<PagedCollectionResultModel<ProductDetailInfor>> GetListProductDetailsAsync([FromQuery] ProductDetailParamsModel model)
+        {
+            var productDetails = await _productBusiness.GetListProductDetailsAsync(model);
+            return productDetails;
         }
 
         [AuthorizeFilter(TypeAcc.Staff)]

@@ -56,5 +56,25 @@ namespace ShopOnline.Core.Models.Enum
             EWallet = 2,
             BankTransfer = 3,
         }
+
+        public enum CustomerSortByEnum
+        {
+            Id = 1,
+            Name = 2,
+        }
+
+        public enum ProductSortByEnum
+        {
+            Id = 1,
+            Name = 2,
+            Price = 3,
+        }
+
+        public enum OrderSortByEnum
+        {
+            Id = 1,
+            OrderDate = 2,
+        }
+
     }
 }

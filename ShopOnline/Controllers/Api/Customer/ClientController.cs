@@ -52,6 +52,13 @@ namespace ShopOnline.Controllers.Customer
             return Ok(productDetailPageViewModel);
         }
 
+        [HttpGet("detail-product")]
+        public async Task<IActionResult> ProductDetailAsync(int id)
+        {
+            var productDetail = await _clientBusiness.GetDetailProductAsync(id);
+            return Ok(productDetail);
+        }
+
         [AuthorizeFilter(TypeAcc.Customer)]
         [HttpPost("CreateReviewDetail")]
         public async Task<IActionResult> CreateReviewDetailAsync(ReviewDetailModel reviewDetail)
@@ -77,6 +84,23 @@ namespace ShopOnline.Controllers.Customer
                 ProductsInfor = productInforsPaged,
             };
 
+            return Ok(productsBrandPageViewModel);
+        }
+
+        [HttpGet("products-of-brand")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetListProductByBrandAsync([FromQuery] ProductParamsModel model)
+        {
+            var products = await _clientBusiness.GetListProductOfBrandAsync(model);
+
+            var productsBrandPageViewModel = new ProductsOfBrandViewModel
+            {
+                Skip = model.Skip,
+                Take = model.Take,
+                AmountProduct = products.AmountProduct,
+                TypeOfBrand = await _clientBusiness.GetTypesOfBrandAsync(model.BrandId),
+                ProductsInfor = products.ProductsInfor,
+            };
             return Ok(productsBrandPageViewModel);
         }
 
@@ -139,5 +163,15 @@ namespace ShopOnline.Controllers.Customer
 
             return products;
         }
+
+        [HttpGet("products-brand")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<ProductDetailModel>> FilterProducts(int idBrand)
+        {
+            var products = await _clientBusiness.GetProductsByIdBrandAsync(idBrand);
+
+            return products;
+        }
+
     }
 }

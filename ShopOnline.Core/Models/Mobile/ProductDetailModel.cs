@@ -1,4 +1,5 @@
 ﻿using ShopOnline.Core.Models.Client;
+using ShopOnline.Core.Models.Product;
 using System.Collections.Generic;
 
 namespace ShopOnline.Core.Models.Mobile
@@ -19,5 +20,11 @@ namespace ShopOnline.Core.Models.Mobile
         public string Description { get; set; }
         public string Pic2 { get; set; }
         public string Pic3 { get; set; }
+    }
+
+    public class ProductBrandModel
+    {
+        public List<ProductDetailModel> ProductDetails { get; set; }
+        public List<ProductTypeInfor> ProductTypeInfors { get; set; }
     }
 }

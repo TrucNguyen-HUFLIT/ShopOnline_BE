@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ShopOnline.Core.Validators.Paging;
+using System.Collections.Generic;
 using X.PagedList;
+using static ShopOnline.Core.Models.Enum.AppEnum;
 
 namespace ShopOnline.Core.Models.Client
 {
@@ -58,5 +60,22 @@ namespace ShopOnline.Core.Models.Client
     {
         public BrandInforModel BrandInfor { get; set; }
         public List<TypeInforModel> TypeInfors { get; set; }
+    }
+
+    public class ProductsOfBrandViewModel
+    {
+        public int Skip { get; set; }
+        public int Take { get; set; }
+        public int AmountProduct { get; set; }
+        public TypeOfBrandInforModel TypeOfBrand { get; set; }
+        public List<ProductInforModel> ProductsInfor { get; set; }
+    }
+
+    public class ProductParamsModel: PagedCollectionParametersModel
+    {
+        public bool IsDescending { get; set; }
+        public ProductSortByEnum SortBy { get; set; }
+        public int BrandId { get; set; }
+        public int? TypeId { get; set; }
     }
 }

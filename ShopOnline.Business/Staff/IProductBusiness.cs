@@ -1,4 +1,5 @@
 ﻿using ShopOnline.Core.Models.Product;
+using ShopOnline.Core.Validators.Paging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using X.PagedList;
@@ -30,6 +31,8 @@ namespace ShopOnline.Business.Staff
         Task CreateProductDetailAsync(ProductDetailCreate productDetailCreate);
         Task<bool> UpdateProductDetailAsync(ProductDetailUpdate productDetailUpdate);
         Task<bool> DeleteProductDetailAsync(int id);
+        Task<PagedCollectionResultModel<ProductDetailInfor>> GetListProductDetailsAsync(ProductDetailParamsModel model);
+
 
         // Product
         Task<IPagedList<ProductInfor>> GetListProductAsync(string sortOrder, string currentFilter, string searchString, int? page);

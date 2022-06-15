@@ -3,6 +3,7 @@ using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
 using ShopOnline.Core.Models.Staff;
+using ShopOnline.Core.Validators.Paging;
 using System.Threading.Tasks;
 using static ShopOnline.Core.Models.Enum.AppEnum;
 
@@ -18,23 +19,11 @@ namespace ShopOnline.Controllers.Staff
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpGet("ListStaff")]
-        public async Task<IActionResult> ListStaff(string sortOrder, string currentFilter, string searchString, int? page)
+        [HttpGet("")]
+        public async Task<PagedCollectionResultModel<StaffInfor>> ListStaff([FromQuery] StaffParamsModel model)
         {
-            //ViewBag.CurrentSort = sortOrder;
-            //ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) || sortOrder.Equals("name") ? "name_desc" : "name";
-
-            //ViewBag.IdSortParm = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
-
-            if (searchString != null) page = 1;
-            else searchString = currentFilter;
-            //ViewBag.CurrentFilter = searchString;
-
-            var model = new StaffModel
-            {
-                ListStaff = await _staffBusiness.GetListStaffAccAsync(sortOrder, TypeAcc.Staff, searchString, page)
-            };
-            return Ok(model);
+            var staffs = await _staffBusiness.GetListStaffAsync(model);
+            return staffs;
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
@@ -49,23 +38,20 @@ namespace ShopOnline.Controllers.Staff
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpPost("CreateStaff")]
+        [HttpPost("create-staff")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         [TypeFilter(typeof(ExceptionFilter))]
-        public async Task<IActionResult> CreateStaff([FromForm] StaffCreate staffCreate)
+        public async Task<IActionResult> CreateStaff([FromBody] StaffCreate staffCreate)
         {
-            await _staffBusiness.CreateAsync(staffCreate, TypeAcc.Staff);
-            return Ok();
+            var staff = await _staffBusiness.CreateAsync(staffCreate, TypeAcc.Staff);
+            return Ok(staff);
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpGet("UpdateStaff")]
-        public IActionResult UpdateStaff(int id)
+        [HttpGet("get-staff")]
+        public async Task<IActionResult> GetStaffById(int id)
         {
-            var model = new StaffEditViewModel
-            {
-                StaffEdit = _staffBusiness.GetStaffById(id, TypeAcc.Staff),
-            };
+            var model = await _staffBusiness.GetStaffById(id, TypeAcc.Staff);
             return Ok(model);
         }
 
@@ -155,25 +141,25 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [AuthorizeFilter(TypeAcc.Admin)]
-        [HttpGet("ListManager")]
-        public async Task<IActionResult> ListManager(string sortOrder, string currentFilter, string searchString, int? page)
-        {
-            //ViewBag.CurrentSort = sortOrder;
-            //ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) || sortOrder.Equals("name") ? "name_desc" : "name";
+        //[AuthorizeFilter(TypeAcc.Admin)]
+        //[HttpGet("ListManager")]
+        //public async Task<IActionResult> ListManager(string sortOrder, string currentFilter, string searchString, int? page)
+        //{
+        //    //ViewBag.CurrentSort = sortOrder;
+        //    //ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) || sortOrder.Equals("name") ? "name_desc" : "name";
 
-            //ViewBag.IdSortParm = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
+        //    //ViewBag.IdSortParm = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
 
-            if (searchString != null) page = 1;
-            else searchString = currentFilter;
-            //ViewBag.CurrentFilter = searchString;
+        //    if (searchString != null) page = 1;
+        //    else searchString = currentFilter;
+        //    //ViewBag.CurrentFilter = searchString;
 
-            var model = new StaffModel
-            {
-                ListStaff = await _staffBusiness.GetListStaffAccAsync(sortOrder, TypeAcc.Manager, searchString, page)
-            };
-            return Ok(model);
-        }
+        //    var model = new StaffModel
+        //    {
+        //        ListStaff = await _staffBusiness.GetListStaffAccAsync(sortOrder, TypeAcc.Manager, searchString, page)
+        //    };
+        //    return Ok(model);
+        //}
 
         [AuthorizeFilter(TypeAcc.Admin)]
         [HttpGet("CreateManager")]
@@ -196,16 +182,16 @@ namespace ShopOnline.Controllers.Staff
             return Ok();
         }
 
-        [AuthorizeFilter(TypeAcc.Admin)]
-        [HttpGet("UpdateManager")]
-        public IActionResult UpdateManager(int id)
-        {
-            var model = new StaffEditViewModel
-            {
-                StaffEdit = _staffBusiness.GetStaffById(id, TypeAcc.Manager),
-            };
-            return Ok(model);
-        }
+        //[AuthorizeFilter(TypeAcc.Admin)]
+        //[HttpGet("UpdateManager")]
+        //public IActionResult UpdateManager(int id)
+        //{
+        //    var model = new StaffEditViewModel
+        //    {
+        //        StaffEdit = aww _staffBusiness.GetStaffById(id, TypeAcc.Manager),
+        //    };
+        //    return Ok(model);
+        //}
 
         [AuthorizeFilter(TypeAcc.Admin)]
         [HttpPost("UpdateManager")]

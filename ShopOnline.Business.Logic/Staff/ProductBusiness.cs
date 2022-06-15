@@ -6,6 +6,7 @@ using ShopOnline.Core.Entities;
 using ShopOnline.Core.Exceptions;
 using ShopOnline.Core.Models.Enum;
 using ShopOnline.Core.Models.Product;
+using ShopOnline.Core.Validators.Paging;
 using ShopOnline.Data.Repositories.Product;
 using System;
 using System.Collections.Generic;
@@ -640,5 +641,61 @@ namespace ShopOnline.Business.Logic.Staff
                 return false;
             }
         }
+
+        public async Task<PagedCollectionResultModel<ProductDetailInfor>> GetListProductDetailsAsync(ProductDetailParamsModel model)
+        {
+            var productDetailsQuery = _context.ProductDetails.Where(x => !x.IsDeleted);
+            if (!string.IsNullOrWhiteSpace(model.Terms))
+            {
+                var termsNormalize = model.Terms.Trim().ToUpperInvariant();
+                productDetailsQuery = productDetailsQuery.Where(x => x.Id.ToString() == termsNormalize
+                                            || x.Name.Contains(termsNormalize));
+            }
+
+            switch (model.SortBy)
+            {
+                case AppEnum.ProductSortByEnum.Name:
+                    productDetailsQuery = model.IsDescending
+                         ? productDetailsQuery.OrderByDescending(x => x.Name)
+                         : productDetailsQuery.OrderBy(x => x.Name);
+                    break;
+                case AppEnum.ProductSortByEnum.Id:
+                    productDetailsQuery = model.IsDescending
+                         ? productDetailsQuery.OrderByDescending(x => x.Id)
+                         : productDetailsQuery.OrderBy(x => x.Id);
+                    break;
+                default:
+                    productDetailsQuery = model.IsDescending
+                         ? productDetailsQuery.OrderByDescending(x => x.Id)
+                         : productDetailsQuery.OrderBy(x => x.Id);
+                    break;
+            }
+            var totalRecord = productDetailsQuery.Count();
+
+            var productDetails = await productDetailsQuery.Select(x => new ProductDetailInfor
+            {
+                Id = x.Id,
+                Name = x.Name,
+                BasePrice = x.BasePrice,
+                Description = x.Description,
+                Status = x.Status,
+                ProductTypeName = x.ProductType.Name,
+                Price = x.Price,
+                Pic1 = x.Pic1,
+                Pic2 = x.Pic2,
+                Pic3 = x.Pic3,
+            }).Skip(model.Skip).Take(model.Take).ToListAsync();
+
+            return new PagedCollectionResultModel<ProductDetailInfor>
+            {
+                Skip = model.Skip,
+                Take = model.Take,
+                Total = totalRecord,
+                Result = productDetails,
+                Terms = model.Terms
+            };
+        }
+
+
     }
 }
