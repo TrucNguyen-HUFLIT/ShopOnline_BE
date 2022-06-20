@@ -29,9 +29,9 @@ namespace ShopOnline.Business.Logic.Staff
             this.hostEnvironment = hostEnvironment;
         }
 
-        public async Task<PagedCollectionResultModel<StaffInfor>> GetListStaffAsync(StaffParamsModel model)
+        public async Task<PagedCollectionResultModel<StaffInfor>> GetListStaffAsync(StaffParamsModel model, TypeAcc typeAcc)
         {
-            var staffQuery = _context.Staffs.Where(x => !x.IsDeleted);
+            var staffQuery = _context.Staffs.Where(x => !x.IsDeleted && x.TypeAcc == typeAcc);
 
             if (!string.IsNullOrWhiteSpace(model.Terms))
             {

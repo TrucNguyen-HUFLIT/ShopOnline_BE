@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopOnline.Business.Staff;
 using ShopOnline.Controllers.Api;
 using ShopOnline.Core.Filters;
@@ -22,7 +23,7 @@ namespace ShopOnline.Controllers.Staff
         [HttpGet("")]
         public async Task<PagedCollectionResultModel<StaffInfor>> ListStaff([FromQuery] StaffParamsModel model)
         {
-            var staffs = await _staffBusiness.GetListStaffAsync(model);
+            var staffs = await _staffBusiness.GetListStaffAsync(model, TypeAcc.Staff);
             return staffs;
         }
 
@@ -48,7 +49,8 @@ namespace ShopOnline.Controllers.Staff
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpGet("get-staff")]
+        [AllowAnonymous]
+        [HttpGet("get-staff/{id}")]
         public async Task<IActionResult> GetStaffById(int id)
         {
             var model = await _staffBusiness.GetStaffById(id, TypeAcc.Staff);
@@ -56,7 +58,7 @@ namespace ShopOnline.Controllers.Staff
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpPost("UpdateStaff")]
+        [HttpPut("update-staff")]
         [TypeFilter(typeof(ModelStateAjaxFilter))]
         public async Task<IActionResult> UpdateStaff(StaffEdit staffEdit)
         {

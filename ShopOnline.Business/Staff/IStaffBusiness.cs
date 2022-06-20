@@ -8,7 +8,7 @@ namespace ShopOnline.Business.Staff
 {
     public interface IStaffBusiness
     {
-        Task<PagedCollectionResultModel<StaffInfor>> GetListStaffAsync(StaffParamsModel model);
+        Task<PagedCollectionResultModel<StaffInfor>> GetListStaffAsync(StaffParamsModel model, TypeAcc typeAcc);
         Task <int> CreateAsync(StaffCreate staffCreate, TypeAcc typeAcc);
         Task<StaffEdit> GetStaffById(int id, TypeAcc typeAcc);
         Task<bool> EditAsync(StaffEdit staffEdit, TypeAcc typeAcc);
