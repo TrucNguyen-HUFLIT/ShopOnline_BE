@@ -32,7 +32,8 @@ namespace ShopOnline.Core.Models.Product
         [Display(Name = "Type")]
         public int IdProductType { get; set; }
         public string Description { get; set; }
-        public string ProductTypeName { get; set; }
+        
+        public string Type { get; set; }
     }
 
     public class ProductDetailParamsModel: PagedCollectionParametersModel

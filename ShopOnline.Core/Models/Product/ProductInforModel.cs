@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ShopOnline.Core.Validators.Paging;
+using System.Collections.Generic;
 using X.PagedList;
 using static ShopOnline.Core.Models.Enum.AppEnum;
 
@@ -16,15 +17,18 @@ namespace ShopOnline.Core.Models.Product
         public int Id { get; set; }
         public string Name { get; set; }
         public int Quantity { get; set; }
-        public ProductSize Size { get; set; }
+        public int Size { get; set; }
         public int IdProductDetail { get; set; }
     }
 
     public class ProductInfor : ProductBase
     {
-        public string Pic1 { get; set; }
-        public string Pic2 { get; set; }
-        public string Pic3 { get; set; }
+    }
+
+    public class ProductParamsModel : PagedCollectionParametersModel
+    {
+        public bool IsDescending { get; set; }
+        public ProductSortByEnum SortBy { get; set; }
     }
 
     public class ProductCreate : ProductBase

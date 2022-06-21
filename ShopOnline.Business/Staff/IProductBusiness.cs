@@ -27,8 +27,8 @@ namespace ShopOnline.Business.Staff
         // ProductDetail
         Task<IPagedList<ProductDetailInfor>> GetListProductDetailAsync(string sortOrder, string currentFilter, string searchString, int? page);
         Task<List<ProductTypeInfor>> GetListProductType();
-        ProductDetailUpdate GetProductDetailByIdAsync(int id);
-        Task CreateProductDetailAsync(ProductDetailCreate productDetailCreate);
+        Task<ProductDetailUpdate> GetProductDetailByIdAsync(int id);
+        Task<int> CreateProductDetailAsync(ProductDetailCreate productDetailCreate);
         Task<bool> UpdateProductDetailAsync(ProductDetailUpdate productDetailUpdate);
         Task<bool> DeleteProductDetailAsync(int id);
         Task<PagedCollectionResultModel<ProductDetailInfor>> GetListProductDetailsAsync(ProductDetailParamsModel model);
@@ -36,9 +36,10 @@ namespace ShopOnline.Business.Staff
 
         // Product
         Task<IPagedList<ProductInfor>> GetListProductAsync(string sortOrder, string currentFilter, string searchString, int? page);
+        Task<PagedCollectionResultModel<ProductInfor>> GetListProductAsync(ProductParamsModel model);
         Task<List<ProductDetailInfor>> GetListProductDetail();
         Task<ProductUpdate> GetProductByIdAsync(int id);
-        Task CreateProductAsync(ProductCreate productCreate);
+        Task<int> CreateProductAsync(ProductCreate productCreate);
         Task<bool> DeleteProductAsync(int id);
         Task<bool> UpdateProductAsync(ProductUpdate productUpdate);
 
