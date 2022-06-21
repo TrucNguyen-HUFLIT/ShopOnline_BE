@@ -176,49 +176,6 @@ namespace ShopOnline.Controllers.Staff
         }
 
         [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpGet("CreateProductDetail")]
-        public async Task<IActionResult> CreateProductDetail()
-        {
-            var model = new ProductDetailCreateViewModel
-            {
-                ProductDetailCreate = new ProductDetailCreate(),
-                ListProductType = await _productBusiness.GetListProductType(),
-            };
-            return Ok(model);
-        }
-
-        [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpPost("CreateProductDetail")]
-        [TypeFilter(typeof(ModelStateAjaxFilter))]
-        [TypeFilter(typeof(ExceptionFilter))]
-        public async Task<IActionResult> CreateProductDetail([FromForm] ProductDetailCreate productDetailCreate)
-        {
-            await _productBusiness.CreateProductDetailAsync(productDetailCreate);
-            return Ok();
-        }
-
-        [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpGet("UpdateProductDetail")]
-        public async Task<IActionResult> UpdateProductDetail(int id)
-        {
-            var model = new ProductDetailUpdateViewModel
-            {
-                ProductDetailUpdate = _productBusiness.GetProductDetailByIdAsync(id),
-                ListProductType = await _productBusiness.GetListProductType(),
-            };
-            return Ok(model);
-        }
-
-        [AuthorizeFilter(TypeAcc.Manager)]
-        [HttpPost("UpdateProductDetail")]
-        [TypeFilter(typeof(ModelStateAjaxFilter))]
-        public async Task<IActionResult> UpdateProductDetail(ProductDetailUpdate productDetailUpdate)
-        {
-            await _productBusiness.UpdateProductDetailAsync(productDetailUpdate);
-            return Ok(productDetailUpdate.Id);
-        }
-
-        [AuthorizeFilter(TypeAcc.Manager)]
         [HttpGet("DeleteProductDetail")]
         public async Task<IActionResult> DeleteProductDetailAsync(int id)
         {

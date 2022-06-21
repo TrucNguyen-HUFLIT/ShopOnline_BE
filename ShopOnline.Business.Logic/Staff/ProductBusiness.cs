@@ -306,7 +306,7 @@ namespace ShopOnline.Business.Logic.Staff
             return productDetails;
         }
 
-        public async Task CreateProductDetailAsync(ProductDetailCreate productDetailCreate)
+        public async Task<int> CreateProductDetailAsync(ProductDetailCreate productDetailCreate)
         {
             var productDetail = await _context.ProductDetails.Where(x => x.Name == productDetailCreate.Name && !x.IsDeleted).Select(x => x.Name).FirstOrDefaultAsync();
             if (productDetail == null)
@@ -360,6 +360,7 @@ namespace ShopOnline.Business.Logic.Staff
 
                 _context.ProductDetails.Add(productDetailEntity);
                 await _context.SaveChangesAsync();
+                return productDetailEntity.Id;
             }
             else
             {
@@ -384,7 +385,7 @@ namespace ShopOnline.Business.Logic.Staff
             productDetailEntity.Price = productDetailUpdate.Price;
             productDetailEntity.BasePrice = productDetailUpdate.BasePrice;
             productDetailEntity.Status = productDetailUpdate.Status;
-            productDetailEntity.IdProductType = productDetailUpdate.IdProductType;
+            //productDetailEntity.IdProductType = productDetailUpdate.IdProductType;
 
             #region Save Image from wwwroot/img
             string wwwRootPath = hostEnvironment.WebRootPath;
@@ -433,9 +434,9 @@ namespace ShopOnline.Business.Logic.Staff
             return true;
         }
 
-        public ProductDetailUpdate GetProductDetailByIdAsync(int id)
+        public async Task<ProductDetailUpdate> GetProductDetailByIdAsync(int id)
         {
-            var productDetail = _context.ProductDetails.Where(x => x.Id == id && !x.IsDeleted).Select(x => new ProductDetailUpdate
+            var productDetail = await _context.ProductDetails.Where(x => x.Id == id && !x.IsDeleted).Select(x => new ProductDetailUpdate
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -445,9 +446,10 @@ namespace ShopOnline.Business.Logic.Staff
                 Pic2 = x.Pic2,
                 Pic3 = x.Pic3,
                 Price = x.Price,
+                Type = x.ProductType.Name,
                 BasePrice = x.BasePrice,
                 Status = x.Status,
-            }).FirstOrDefault();
+            }).FirstOrDefaultAsync();
 
             return productDetail;
         }
@@ -460,7 +462,7 @@ namespace ShopOnline.Business.Logic.Staff
                 Name = x.Name,
                 Quantity = x.Quantity,
                 IdProductDetail = x.IdProductDetail,
-                Size = x.Size,
+                Size = (int)x.Size,
             }).FirstOrDefaultAsync();
 
             return product;
@@ -480,7 +482,7 @@ namespace ShopOnline.Business.Logic.Staff
                         Id = product.Id,
                         Name = product.Name,
                         Quantity = product.Quantity,
-                        Size = product.Size,
+                        Size = (int)product.Size,
                         IdProductDetail = product.IdProductDetail,
                         //Pic1 = product.ProductDetail.Pic1,
                         //Pic2 = product.ProductDetail.Pic2,
@@ -509,11 +511,11 @@ namespace ShopOnline.Business.Logic.Staff
             return null;
         }
 
-        public async Task CreateProductAsync(ProductCreate productCreate)
+        public async Task<int> CreateProductAsync(ProductCreate productCreate)
         {
             var product = await _productRepository.Get()
                             .Where(x => x.IdProductDetail == productCreate.IdProductDetail
-                            && x.Size == productCreate.Size)
+                            && (int)x.Size == productCreate.Size)
                             .FirstOrDefaultAsync();
 
             if (product == null)
@@ -522,19 +524,21 @@ namespace ShopOnline.Business.Logic.Staff
                 {
                     Name = productCreate.Name,
                     Quantity = productCreate.Quantity,
-                    Size = productCreate.Size,
+                    Size = (AppEnum.ProductSize)productCreate.Size,
                     IdProductDetail = productCreate.IdProductDetail,
                 };
-
+                productCreate.Id = productEntity.Id;
                 _productRepository.Add(productEntity);
             }
             else
             {
                 product.Quantity += productCreate.Quantity;
+                productCreate.Id = product.Id;
                 _productRepository.Update(product);
             }
 
             await _productRepository.SaveChangesAsync();
+            return productCreate.Id;
         }
 
         public async Task<bool> UpdateProductAsync(ProductUpdate productUpdate)
@@ -679,7 +683,7 @@ namespace ShopOnline.Business.Logic.Staff
                 BasePrice = x.BasePrice,
                 Description = x.Description,
                 Status = x.Status,
-                ProductTypeName = x.ProductType.Name,
+                Type = x.ProductType.Name,
                 Price = x.Price,
                 Pic1 = x.Pic1,
                 Pic2 = x.Pic2,
@@ -696,6 +700,53 @@ namespace ShopOnline.Business.Logic.Staff
             };
         }
 
+        public async Task<PagedCollectionResultModel<ProductInfor>> GetListProductAsync(ProductParamsModel model)
+        {
+            var productsQuery = _context.Products.Where(x => !x.IsDeleted);
+            if (!string.IsNullOrWhiteSpace(model.Terms))
+            {
+                var termsNormalize = model.Terms.Trim().ToUpperInvariant();
+                productsQuery = productsQuery.Where(x => x.Id.ToString() == termsNormalize
+                                            || x.Name.Contains(termsNormalize));
+            }
 
+            switch (model.SortBy)
+            {
+                case AppEnum.ProductSortByEnum.Name:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Name)
+                         : productsQuery.OrderBy(x => x.Name);
+                    break;
+                case AppEnum.ProductSortByEnum.Id:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Id)
+                         : productsQuery.OrderBy(x => x.Id);
+                    break;
+                default:
+                    productsQuery = model.IsDescending
+                         ? productsQuery.OrderByDescending(x => x.Id)
+                         : productsQuery.OrderBy(x => x.Id);
+                    break;
+            }
+            var totalRecord = productsQuery.Count();
+
+            var products = await productsQuery.Select(x => new ProductInfor
+            {
+                Id = x.Id,
+                Name = x.Name,
+                IdProductDetail = x.IdProductDetail,
+                Quantity = x.Quantity,
+                Size = (int)x.Size
+            }).Skip(model.Skip).Take(model.Take).ToListAsync();
+
+            return new PagedCollectionResultModel<ProductInfor>
+            {
+                Skip = model.Skip,
+                Take = model.Take,
+                Total = totalRecord,
+                Result = products,
+                Terms = model.Terms
+            }; ;
+        }
     }
 }
