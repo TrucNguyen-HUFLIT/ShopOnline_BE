@@ -1,4 +1,6 @@
-﻿using ShopOnline.Core.Models.Customer;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ShopOnline.Core.Models.Customer;
 using System;
 using System.Collections.Generic;
 using X.PagedList;
@@ -22,6 +24,7 @@ namespace ShopOnline.Core.Models.HistoryOrder
         public bool IsPaid { get; set; }
         public string Address { get; set; }
         public int TotalPrice { get; set; }
+        public int ExtraFeeUSD { get; set; }
     }
 
     public class HistoryOrderShipperInfor : HistoryOrderInfor
