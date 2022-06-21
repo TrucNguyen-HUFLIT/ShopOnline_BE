@@ -88,6 +88,7 @@ namespace ShopOnline.Business.Logic.Staff
             foreach (var order in listHistoryOrder)
             {
                 order.TotalPrice = await ConvertCurrencyHelper.ConvertVNDToUSD(order.TotalPrice);
+                order.ExtraFeeUSD = await ConvertCurrencyHelper.ConvertVNDToUSD(order.ExtraFee);
             }
 
             return listHistoryOrder;
