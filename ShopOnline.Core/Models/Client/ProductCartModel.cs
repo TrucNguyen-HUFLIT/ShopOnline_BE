@@ -33,6 +33,7 @@ namespace ShopOnline.Core.Models.Client
         public PaymentMethod PaymentMethod { get; set; }
 
         public string Address { get; set; }
+        public bool IsPaid { get; set; }
     }
 
     public class ProductCheckOutModel

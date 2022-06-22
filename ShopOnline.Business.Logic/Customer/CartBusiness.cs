@@ -234,7 +234,7 @@ namespace ShopOnline.Business.Logic.Customer
                     StatusOrder = StatusOrder.Processing,
                     IdCustomer = customer.Id,
                     Address = model.Address,
-                    IsPaid = false,
+                    IsPaid = model.IsPaid ? model.IsPaid : false,
                     Payment = model.PaymentMethod,
                     ExtraFee = products.Sum(x => x.ProductDetail.Price) > 5000000 ? 0 : 5000000,
                 };
